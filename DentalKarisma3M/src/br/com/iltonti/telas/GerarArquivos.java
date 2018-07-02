@@ -17,5 +17,7 @@ public class GerarArquivos {
         geraClientes.gerarArquivo();
         GeraArqEstoque geraEstoques = new GeraArqEstoque();
         geraEstoques.gerarArquivo();
+        GeraArqProdutos geraProdutos = new GeraArqProdutos();
+        geraProdutos.gerarArquivo();
     }
 }
