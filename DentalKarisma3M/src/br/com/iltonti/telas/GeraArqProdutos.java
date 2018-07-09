@@ -40,11 +40,16 @@ public class GeraArqProdutos {
         //Instancia Classe para criar formatos de datas para gravar arquivos
         DataHoraFormatos dataHora = new DataHoraFormatos();
 
-        String sql1 = "SELECT Codigo_Prod_Serv,"
-                + "replace((case when Qtde_Produtos_Atual < 0 then 0 else qtde_estoque_atual end),',','.') as QtdeProdutos\n"
-                + "  FROM [dbo].[View_Produtos_Atual_Filial_Prod_Serv]"
-                + "  where codigo_filial =1 and Codigo_Prod_Serv <> '0'"
-                + "  order by Nome_Prod_Serv";
+        String sql1 = "SELECT distinct [Codigo],[Codigo_Barras]"
+                + ", Replace(Replace([Promocao],'1','02'),'0','01') as promo"
+                + ", Replace(pc.preco, ',','.') as Preco"
+                + ", Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(SubString"
+                + "(Nome,1,50),'é','e'),'á','a'),'ã','a'),'ç','c'),'#',''),'(', ''),')', ' '),'ó', 'o'),':', ' '),'.', ' '),'í', 'i'),'+',' '),'-',' ') as NomePro"
+                + ", replace(replace(p.Inativo, '1','02'),'0','01')"
+                + "  FROM [dbo].[Prod_Serv] as p inner join Movimento_Prod_serv as mp"
+                + "  on p.ordem = mp.ordem_prod_serv inner join prod_serv_precos as pc on p.Ordem = pc.ordem_prod_serv"
+                + "  where pc.Ordem_Tabela_Preco = '2' and p.inativo = '0'"
+                + "  order by NomePro";
         try {
             // Objeto de conversação Statement  
             pst = conexao.prepareStatement(sql1);
@@ -61,17 +66,19 @@ public class GeraArqProdutos {
                     + "|" + cnpjEmissor + "|" + cnpjDestinatario);
 
             while (rs.next()) {  //Lê e escreve...  
-                String tipoRegistoProdutos = "02";                
+                String tipoRegistoProdutos = "02";
                 String codigoItem = rs.getString(1);
-                Double quantProdutos = rs.getDouble(2);
-                Double quantProdutosTransito = rs.getDouble(2);
-                gravaArquivo.println(tipoRegistoProdutos + "|" + cnpjEmissor + "|"
-                        + codigoItem + "|" + codigoItem // Tem de alterar para código de barras 
-                        + "|" + "01" // deveria ser, buscar do campo promocional, por enquanto tá fixo
-                        + "|" + "3.00000" //Indica a quantidade de unidades do produto que a embalagem contém.
-                        + "|" + "10.00" // Preço de tabela cadastrado para venda do código de barras da menor unidade de consumo.
-                        + "|" + "Nome do Produto" // Informa a descrição do produto relacionado ao código interno de identificação.
-                        + "|" + "01");  // Informa se o produto em questão está Ativo ou Inativo no distribuidor
+                String codigoProduto = rs.getString(2);
+                String tipoItem = rs.getString(3);
+                String precoItem = rs.getString(4);
+                String descricaoItem = rs.getString(5);
+                String statusItem = rs.getString(6);
+                gravaArquivo.println(tipoRegistoProdutos + "|" + cnpjIndustria + "|"
+                        + codigoItem + "|" + codigoProduto // Tem de alterar para código de barras 
+                        + "|" + tipoItem + "|" + "1.00000" //Indica a quantidade de unidades do produto que a embalagem contém.
+                        + "|" + precoItem// Preço de tabela cadastrado para venda do código de barras da menor unidade de consumo.
+                        + "|" + descricaoItem // Informa a descrição do produto relacionado ao código interno de identificação.
+                        + "|" + statusItem);  // Informa se o produto em questão está Ativo ou Inativo no distribuidor
             }
             // Fecha fluxos...  
             rs.close();

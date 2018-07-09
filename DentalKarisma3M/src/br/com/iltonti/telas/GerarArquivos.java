@@ -5,12 +5,14 @@
  */
 package br.com.iltonti.telas;
 
+import java.sql.SQLException;
+
 /**
  *
  * @author IltonSB
  */
 public class GerarArquivos {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         GeraArqVendedores geraVendedores = new GeraArqVendedores();
         geraVendedores.gerarArquivo();
         GeraArqClientes geraClientes = new GeraArqClientes();
@@ -19,5 +21,7 @@ public class GerarArquivos {
         geraEstoques.gerarArquivo();
         GeraArqProdutos geraProdutos = new GeraArqProdutos();
         geraProdutos.gerarArquivo();
+        GeraArqVendas geraVendas = new GeraArqVendas();
+        geraVendas.gerarArquivo();
     }
 }
