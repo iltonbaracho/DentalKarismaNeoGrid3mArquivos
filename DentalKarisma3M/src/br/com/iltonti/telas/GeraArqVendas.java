@@ -35,21 +35,27 @@ public class GeraArqVendas {
         //String numRelatorio = "12345678901234567890";
         String cnpjEmissor = "01837045000188";
         // 01837045000188 - Dental Karisma  /  03303105000108 VR doctor
-        String cnpjDestinatario = "03887830009046";
+        String cnpjDestinatario = "45985371000108";
         // Faz conexão com o BD
         conexao = ModuloConexao3M.conector();
         //Instancia Classe para criar formatos de datas para gravar arquivos
         DataHoraFormatos dataHora = new DataHoraFormatos();
 
         try {
-            String nfVen = "SELECT distinct '02' as TiReg, '01' as TiFat, MNFe.Numero, MNFe.Identificacao_Documento as Serie"
+            String nfVen = "SELECT distinct '02' as TiReg, '01' as TiFat, MNFe.Numero,"
+                    + " REPLICATE('0', 3 - LEN(MNFe.Identificacao_Documento)) + RTrim(MNFe.Identificacao_Documento) as Serie "
                     + ", Replace(Replace(Replace(MV.Tipo_operacao, 'VND', '01'), 'Dev', '02'), 'Can', '03') as TipoNF"
-                    + ", Replace(Replace(Replace(Convert(VarChar(16),MNFe.[Data_Emissao],120),' ',''),'-',''),':',''), MP1.[Codigo_Vendedor], MNFe.[Cli_For_Codigo], F.UF, F.Cep, C.Estado, C.CEP"
-                    + ", 'CIF' as TipoFrete, '07' as Dias"
+                    + ", Replace(Replace(Replace(Convert(VarChar(16),MNFe.[Data_Emissao],120),' ',''),'-',''),':',''),"
+                    + " MP1.[Codigo_Vendedor], c.CNPJ_Sem_Literais, F.UF, F.Cep, C.Estado, C.CEP"
+                    + ", 'CIF' as TipoFrete, '07' as Dias, c.CPF_Sem_Literais, c.fisica_juridica"
                     + " FROM View_Movimento_Prod_serv as MP1 inner join [View_Movimento_NFe_Relatorio] as MNFe on MP1.ordem_movimento = MNFe.ordem_movimento"
                     + " inner join movimento as MV on MV.ordem = MP1.Ordem_Movimento inner join Filiais as F on MV.Ordem_Filial = F.Ordem"
-                    + " inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem"
-                    + " where codigo_fabricante = '156' and MV.Sequencia = MNFe.Sequencia and F.codigo = '1' and mv.apagado <> '1' and MNFe.Entrada_Saida = 'S'";
+                    + " inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem  inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv"
+                    + " where codigo_fabricante = '156' and MV.Sequencia = MNFe.Sequencia"
+                    + " and F.codigo = '1' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' and mv.desefetivado_estoque = '0'"
+                    + " and MNFe.data_autorizacao between DATEADD(DAY, -90 , GETDATE()) AND getdate()"
+                    + " and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98' and p.inativo = '0' " +
+" and p.codigo_adicional1 <> '' and p.codigo_adicional1 <> '0'";
 
             // Objeto de conversação Statement  
             pstNfVen = conexao.prepareStatement(nfVen);
@@ -74,32 +80,45 @@ public class GeraArqVendas {
                 String tipoNFVenda = rsNfVen.getString(5);
                 String dataEmissaoNFVenda = rsNfVen.getString(6);
                 String codVendedorVenda = rsNfVen.getString(7);
-                String codClienteVenda = rsNfVen.getString(8);
                 String ufEmissorVenda = rsNfVen.getString(9);
                 String cepEmissorVenda = rsNfVen.getString(10);
                 String ufDestinatarioVenda = rsNfVen.getString(11);
                 String cepDestinatarioVenda = rsNfVen.getString(12);
                 String tipoFreteVenda = rsNfVen.getString(13);
                 String diasPagamentoVenda = rsNfVen.getString(14);
+                String fisicaJuridica = rsNfVen.getString(16);
+                String codClienteVenda;
+                //Condição para saber se é pessoa Fisica ou juridica, usar CPF ou CNPJ
+                if ("F".equals(fisicaJuridica) ) {
+                    codClienteVenda = rsNfVen.getString(15);
+                  //  result = "verd " + codigoCliente;
+                } else {
+                    codClienteVenda = rsNfVen.getString(8);
+                    //result = "fals" + codigoCliente;
+                }
                 gravaArquivo.println(tipoRegistoVenda + "|" + tipoFatVenda + "|"
                         + numNFVenda + "|" + serieVenda + "|" + tipoNFVenda + "|"
                         + dataEmissaoNFVenda + "|" + codVendedorVenda + "|" + codClienteVenda + "|"
                         + ufEmissorVenda + "|" + cepEmissorVenda + "|" + ufDestinatarioVenda
                         + "|" + cepDestinatarioVenda + "|" + tipoFreteVenda + "|" + diasPagamentoVenda);
 
-                String itVen = "SELECT distinct '03' as TiReg, MNFe.Numero, MNFe.Identificacao_Documento as Serie"
+                String itVen = "SELECT distinct '03' as TiReg, MNFe.Numero,"
+                        + " REPLICATE('0', 3 - LEN(MNFe.Identificacao_Documento)) + RTrim(MNFe.Identificacao_Documento) as Serie "
                         + ", Replace(Replace(Replace(MV.Tipo_operacao, 'VND', '01'), 'Dev', '02'), 'Can', '03') as TipoNF , MP1.[Codigo]"
-                        + ",Replace(MP1.[Quantidade], ',','.'), Replace(MP1.[Preco_Unitario], ',','.'),'N' as Boni"
+                        + ",format(MP1.[Quantidade], '#.00000'), Replace(MP1.[Preco_Unitario], ',','.'),'N' as Boni"
                         + ",Replace(MP1.[Preco_Total_Sem_Desconto], ',','.'),Replace(MP1.[Preco_Total_Com_Desconto], ',','.')"
                         + ",Replace(MP1.[IPI_Valor], ',','.'), Replace(MP1.[PIS_Normal_Valor], ',','.'), Replace(MP1.[ICMS_Subst_Valor], ',','.')"
                         + ",Replace(MP1.[ICMS_Normal_Valor], ',','.'), Replace(MP1.[Desconto_Valor], ',','.')"
                         + " FROM View_Movimento_Prod_serv as MP1 inner join [View_Movimento_NFe_Relatorio] as MNFe on MP1.ordem_movimento = MNFe.ordem_movimento"
                         + " inner join movimento as MV on MV.ordem = MP1.Ordem_Movimento inner join Filiais as F on MV.Ordem_Filial = F.Ordem"
-                        + " inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem "
+                        + " inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem  inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv"
                         + " where codigo_fabricante = '156' and MV.Sequencia = MNFe.Sequencia "
                         + " and MNFe.Numero = '"
                         + numNFVenda
-                        + "' and F.codigo = '1' and F.codigo = '1' and mv.apagado <> '1' and MNFe.Entrada_Saida = 'S'";
+                        + "' and F.codigo = '1' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' and mv.desefetivado_estoque = '0'"
+                        + " and MNFe.data_autorizacao between DATEADD(DAY, -90 , GETDATE()) AND getdate()"
+                        + " and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98' and p.inativo = '0' \n" +
+" and p.codigo_adicional1 <> '' and p.codigo_adicional1 <> '0'";
 
                 pstItVen = conexao.prepareStatement(itVen);
                 rsItVen = pstItVen.executeQuery();

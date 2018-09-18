@@ -33,18 +33,21 @@ public class GeraArqEstoque {
         //String numRelatorio = "12345678901234567890";
         String cnpjEmissor = "01837045000188";
         // 01837045000188 - Dental Karisma  /  03303105000108 VR doctor
-        String cnpjDestinatario = "03887830009046";
+        String cnpjDestinatario = "45985371000108";
         String cnpjIndustria = "03303105000108";
         // Faz conexão com o BD
         conexao = ModuloConexao3M.conector();
         //Instancia Classe para criar formatos de datas para gravar arquivos
         DataHoraFormatos dataHora = new DataHoraFormatos();
 
-        String sql1 = "SELECT Codigo_Prod_Serv,"
+        String sql1 = "SELECT p.codigo,"
                 + "replace((case when Qtde_Estoque_Atual < 0 then 0 else qtde_estoque_atual end),',','.') as QtdeEstoque\n"
-                + "  FROM [dbo].[View_Estoque_Atual_Filial_Prod_Serv]"
-                + "  where codigo_filial =1 and Codigo_Prod_Serv <> '0'"
-                + "  order by Nome_Prod_Serv";
+                + "  FROM [dbo].[View_Estoque_Atual_Filial_Prod_Serv] as E"
+                + " inner join Prod_Serv as p on e.ordem_prod_serv = p.ordem"
+                + "  where e.codigo_filial =1 and e.Codigo_Prod_Serv <> '0'"
+                + " and e.Data_Alteracao between DATEADD(DAY, -90 , GETDATE()) AND getdate()"
+                + " and p.ordem_fabricante = '98' and p.inativo = '0'"
+                + " and p.codigo_adicional1 <> '' and p.codigo_adicional1 <> '0' order by Nome_Prod_Serv";
         try {
             // Objeto de conversação Statement  
             pst = conexao.prepareStatement(sql1);

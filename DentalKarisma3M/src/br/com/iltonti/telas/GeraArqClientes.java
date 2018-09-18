@@ -39,16 +39,26 @@ public class GeraArqClientes {
         //Instancia Classe para criar formatos de datas para gravar arquivos
         DataHoraFormatos dataHora = new DataHoraFormatos();
 
-        String sql1 = "select codigo, CEP, Estado, Cidade, "
-                + "Replace(Replace(Replace(Replace(Replace(Replace(Replace( Replace(Replace(Replace(Replace(SubString"
-                + "(Endereco,1,50),'é','e'),'á','a'),'ã','a'),'ç','c'),'#',''),'(', ''),')', ' '),'ó', 'o'),':', ' '),'.', ' '),'í', 'i'),"
+        String sql1 = "select distinct c.fisica_juridica, c.CEP, c.Estado,"
+                + "Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace( Replace(Replace(Replace(Replace(SubString"
+                + "(c.Cidade,1,50),'é','e'),'á','a'),'ã','a'),'ç','c'),'#',''),'(', ''),')', ' '),'ó', 'o'),':', ' '),'.', ' '),'í', 'i'),',', ' '),"                
+                + "Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace( Replace(Replace(Replace(Replace(SubString"
+                + "(c.Endereco,1,50),'é','e'),'á','a'),'ã','a'),'ç','c'),'#',''),'(', ''),')', ' '),'ó', 'o'),':', ' '),'.', ' '),'í', 'i'),',', ' '),"
                 + "Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(SubString"
-                + "(Bairro,1,50),'é','e'),'á','a'),'ã','a'),'ç','c'),'#',''),'(', ''),')', ' '),'ó', 'o'),':', ' '),'.', ' '),'í', 'i'),"
+                + "(c.Bairro,1,50),'é','e'),'á','a'),'ã','a'),'ç','c'),'#',''),'(', ''),')', ' '),'ó', 'o'),':', ' '),'.', ' '),'í', 'i'),"
                 + "Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(SubString"
-                + "(Nome,1,50),'é','e'),'á','a'),'ã','a'),'ç','c'),'#',''),'(', ''),')', ' '),'ó', 'o'),':', ' '),'.', ' '),'í', 'i'),"
-                + " fax, Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(SubString"
-                + "(Nome,1,50),'é','e'),'á','a'),'ã','a'),'ç','c'),'#',''),'(', ''),')', ' '),'ó', 'o'),':', ' '),'.', ' '),'í', 'i')"
-                + " from cli_for where codigo > 0 and bloqueado <> 0";
+                + "(c.Nome,1,50),'é','e'),'á','a'),'ã','a'),'ç','c'),'#',''),'(', ''),')', ' '),'ó', 'o'),':', ' '),'.', ' '),'í', 'i')"                
+                + ", c.fax,"
+                + "Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(SubString"
+                + "(c.Nome,1,50),'é','e'),'á','a'),'ã','a'),'ç','c'),'#',''),'(', ''),')', ' '),'ó', 'o'),':', ' '),'.', ' '),'í', 'i')"
+                + " , c.cnpj_sem_literais, c.cpf_sem_literais  from cli_for as c"
+                + " inner join Movimento as mv on c.ordem = mv.ordem_cli_for"
+                + " inner join Movimento_Prod_serv as mp on mv.ordem = mp.Ordem_Movimento "
+                + " inner join prod_serv as p on mp.Ordem_Prod_Serv = p.ordem"
+                + " inner join View_Estoque_Atual_Filial_Prod_Serv as e on e.ordem_prod_serv = p.ordem"
+                + " where ordem_fabricante = '98' and e.codigo_filial =1 and c.cep <> '' and c.cep <> '0'"
+                + " and data_efetivado_estoque between DATEADD(DAY, -90 , GETDATE()) AND getdate()"
+                + " and c.codigo > 0 and (c.cnpj_sem_literais <> '' or c.cpf_sem_literais <> '') and (c.cnpj_sem_literais <> '0' or c.cpf_sem_literais <> '0') ";
         try {
             // Objeto de conversação Statement  
             pst = conexao.prepareStatement(sql1);
@@ -65,7 +75,7 @@ public class GeraArqClientes {
 
             while (rs.next()) {  //Lê e escreve...  
                 String tipoRegistoCliente = "02";
-                String codigoCliente = rs.getString(1);
+                String fisicaJuridica = rs.getString(1);
                 String cepCliente = rs.getString(2);
                 String ufCliente = rs.getString(3);
                 String cidadeCliente = rs.getString(4);
@@ -76,6 +86,15 @@ public class GeraArqClientes {
                 String frequenciaVisita = "03";
                 String telefoneCliente = rs.getString(8);
                 String contatoCliente = rs.getString(9);
+                String codigoCliente;
+                //Condição para saber se é pessoa Fisica ou juridica, usar CPF ou CNPJ
+                if ("F".equals(fisicaJuridica) ) {
+                    codigoCliente = rs.getString(11);
+                  //  result = "verd " + codigoCliente;
+                } else {
+                    codigoCliente = rs.getString(10);
+                    //result = "fals" + codigoCliente;
+                }
                 gravaArquivo.println(tipoRegistoCliente + "|" + codigoCliente + "|"
                         + cepCliente + "|" + ufCliente + "|" + cidadeCliente + "|"
                         + enderecoCliente + "|" + bairroCliente + "|" + nomeCliente + "|"

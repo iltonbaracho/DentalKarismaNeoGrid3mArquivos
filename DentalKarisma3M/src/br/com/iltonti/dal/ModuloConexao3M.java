@@ -28,13 +28,14 @@ public class ModuloConexao3M {
             Class.forName(driver);
             conexao = DriverManager.getConnection(url,user,psswd);
             System.out.println("Conexão Efetuada com sucesso !");
+            //JOptionPane.showMessageDialog(null, "Conexão Efetuada com sucesso !");
     //        System.out.println("Ponto 3 Mod Con");
             return conexao;
         } catch (ClassNotFoundException | SQLException e) {
             System.out.println(e.getMessage());
+            JOptionPane.showMessageDialog(null, e);
             return null;
         }
-    }
-    
+    }  
     
 }

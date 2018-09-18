@@ -34,13 +34,13 @@ public class GeraArqProdutos {
         String cnpjEmissor = "01837045000188";
         // 01837045000188 - Dental Karisma  /  03303105000108 VR doctor
         String cnpjDestinatario = "03887830009046";
-        String cnpjIndustria = "03303105000108";
+        String cnpjIndustria = "45985371000108";
         // Faz conexão com o BD
         conexao = ModuloConexao3M.conector();
         //Instancia Classe para criar formatos de datas para gravar arquivos
         DataHoraFormatos dataHora = new DataHoraFormatos();
 
-        String sql1 = "SELECT distinct [Codigo],[Codigo_Barras]"
+        String sql1 = "SELECT distinct p.Codigo,p.codigo_adicional1"
                 + ", Replace(Replace([Promocao],'1','02'),'0','01') as promo"
                 + ", Replace(pc.preco, ',','.') as Preco"
                 + ", Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(SubString"
@@ -48,8 +48,11 @@ public class GeraArqProdutos {
                 + ", replace(replace(p.Inativo, '1','02'),'0','01')"
                 + "  FROM [dbo].[Prod_Serv] as p inner join Movimento_Prod_serv as mp"
                 + "  on p.ordem = mp.ordem_prod_serv inner join prod_serv_precos as pc on p.Ordem = pc.ordem_prod_serv"
+                + " inner join View_Estoque_Atual_Filial_Prod_Serv as E on e.ordem_prod_serv = p.ordem"
                 + "  where pc.Ordem_Tabela_Preco = '2' and p.inativo = '0'"
-                + "  order by NomePro";
+                + " and ordem_fabricante = '98' and e.codigo_filial =1"
+                + " and mp.data_efetivacao_estoque between DATEADD(DAY, -90 , GETDATE()) AND getdate()"
+                + " and p.codigo_adicional1 <> '' and p.codigo_adicional1 <> '0' order by NomePro";
         try {
             // Objeto de conversação Statement  
             pst = conexao.prepareStatement(sql1);
