@@ -38,7 +38,6 @@ public class GeraArqClientes {
         conexao = ModuloConexao3M.conector();
         //Instancia Classe para criar formatos de datas para gravar arquivos
         DataHoraFormatos dataHora = new DataHoraFormatos();
-
         String sql1 = "select distinct c.fisica_juridica, c.CEP, c.Estado,"
                 + "Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace( Replace(Replace(Replace(Replace(SubString"
                 + "(c.Cidade,1,50),'é','e'),'á','a'),'ã','a'),'ç','c'),'#',''),'(', ''),')', ' '),'ó', 'o'),':', ' '),'.', ' '),'í', 'i'),',', ' '),"                
@@ -58,7 +57,8 @@ public class GeraArqClientes {
                 + " inner join View_Estoque_Atual_Filial_Prod_Serv as e on e.ordem_prod_serv = p.ordem"
                 + " where ordem_fabricante = '98' and e.codigo_filial =1 and c.cep <> '' and c.cep <> '0'"
                 + " and data_efetivado_estoque between DATEADD(DAY, -90 , GETDATE()) AND getdate()"
-                + " and c.codigo > 0 and (c.cnpj_sem_literais <> '' or c.cpf_sem_literais <> '') and (c.cnpj_sem_literais <> '0' or c.cpf_sem_literais <> '0') ";
+                + " and c.codigo > 0 and  (c.cnpj_sem_literais <> '' or c.cpf_sem_literais <> '') and (c.cnpj_sem_literais <> '0' or c.cpf_sem_literais <> '0')"
+                + "and cpf_sem_literais not in ('0')";
         try {
             // Objeto de conversação Statement  
             pst = conexao.prepareStatement(sql1);
