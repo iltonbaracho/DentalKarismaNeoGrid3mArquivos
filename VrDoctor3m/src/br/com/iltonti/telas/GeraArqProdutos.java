@@ -50,7 +50,7 @@ public class GeraArqProdutos {
                 + "  on p.ordem = mp.ordem_prod_serv inner join prod_serv_precos as pc on p.Ordem = pc.ordem_prod_serv"
                 + " inner join View_Estoque_Atual_Filial_Prod_Serv as E on e.ordem_prod_serv = p.ordem"
                 + "  where pc.Ordem_Tabela_Preco = '2' and p.inativo = '0'"
-                + " and ordem_fabricante = '98' and e.codigo_filial =1"
+                + " and ordem_fabricante = '98' and e.codigo_filial = 2"
                 + " and mp.data_efetivacao_estoque between DATEADD(DAY, -90 , GETDATE()) AND getdate()"
                 + " and p.codigo_adicional1 <> '' and p.codigo_adicional1 <> '0' order by NomePro";
         try {

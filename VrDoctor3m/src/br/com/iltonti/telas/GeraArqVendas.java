@@ -52,7 +52,7 @@ public class GeraArqVendas {
                     + " inner join movimento as MV on MV.ordem = MP1.Ordem_Movimento inner join Filiais as F on MV.Ordem_Filial = F.Ordem"
                     + " inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem  inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv"
                     + " where codigo_fabricante = '156' and MV.Sequencia = MNFe.Sequencia"
-                    + " and F.codigo = '1' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' and mv.desefetivado_estoque = '0'"
+                    + " and F.codigo = '2' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' and mv.desefetivado_estoque = '0'"
                     + " and MNFe.data_autorizacao between DATEADD(DAY, -90 , GETDATE()) AND getdate()"
                     + " and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98' and p.inativo = '0' " +
 " and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and C.CEP <> '' and C.CEP <>'0'";
@@ -115,7 +115,7 @@ public class GeraArqVendas {
                         + " where codigo_fabricante = '156' and MV.Sequencia = MNFe.Sequencia "
                         + " and MNFe.Numero = '"
                         + numNFVenda
-                        + "' and F.codigo = '1' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' and mv.desefetivado_estoque = '0'"
+                        + "' and F.codigo = '2' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' and mv.desefetivado_estoque = '0'"
                         + " and MNFe.data_autorizacao between DATEADD(DAY, -90 , GETDATE()) AND getdate()"
                         + " and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98' and p.inativo = '0' \n" +
 " and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')";
