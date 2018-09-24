@@ -1,7 +1,7 @@
 
 USE S9_REAL
 
-select distinct  mp.data_efetivacao_estoque, c.fisica_juridica, c.CEP, c.Estado,
+select distinct mp.data_efetivacao_estoque, c.fisica_juridica, c.CEP, c.Estado,
                 Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace( Replace(Replace(Replace(Replace(SubString
                 (c.Cidade,1,50),'é','e'),'á','a'),'ã','a'),'ç','c'),'#',''),'(', ''),')', ' '),'ó', 'o'),':', ' '),'.', ' '),'í', 'i'),',', ' '),
 				Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace( Replace(Replace(Replace(Replace(SubString
