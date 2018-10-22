@@ -7,6 +7,7 @@ n the template in the editor.
  */
 package br.com.iltonti.telas;
 
+import Relatorios.ReportUtils;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
@@ -16,6 +17,11 @@ import javax.swing.JOptionPane;
  */
 public class GerarArquivos {
     public static void main(String[] args) throws SQLException, InterruptedException {
+        
+        // Gerar o relatorio PDF
+        ReportUtils geraRelFaturamento = new ReportUtils();
+        geraRelFaturamento.gerarRelFatu();
+        
         //String mensagem1 = "Programa Arq3M em execução! Pressione OK e aguarde a mensagem de Fim !";
         //JOptionPane.showMessageDialog(null, mensagem1);
         GeraArqVendedores geraVendedores = new GeraArqVendedores();

@@ -113,4 +113,7 @@ public class GeraArqClientes {
         }
     }
 
+    public void gerarRelFatu() {
+        
+    }
 }

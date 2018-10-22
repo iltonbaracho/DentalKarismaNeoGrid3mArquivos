@@ -12,7 +12,8 @@ inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem  inner 
 where codigo_fabricante = '156' and MV.Sequencia = MNFe.Sequencia and F.codigo = '1'
  and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' and mv.desefetivado_estoque = '0'
 and mp1.estoque_efetivado = '1' and mp1.efetivado_financeiro = '1' and mp1.Estoque_Desefetivado = '0' 
---- and MNFe.data_autorizacao between DATEADD(DAY, -90 , GETDATE()) AND getdate() and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98' and p.inativo = '0'
+--- and MNFe.data_autorizacao between DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1)
+and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98' and p.inativo = '0'
 and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and C.CEP <> '' and C.CEP <>'0'
 order by MNFe.Numero
 
