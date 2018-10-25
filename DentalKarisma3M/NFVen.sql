@@ -1,23 +1,27 @@
 use s9_real
---- SELECT top 50 MNFe.[Ordem_Movimento],MNFe.[Data],MNFe.[Sequencia],MNFe.[Cli_For_Codigo],MNFe.[Preco_Final_Somado],MNFe.[Numero],MNFe.[Data_Emissao],MNFe.[Identificacao_Documento] as serie,MNFe.[Tipo_Documento]  FROM [dbo].[View_Movimento_NFe_Relatorio] as MNFe
---- 
 
-SELECT distinct '02' as TiReg, '01' as TiFat, MNFe.Numero,REPLICATE('0', 3 - LEN(MNFe.Identificacao_Documento)) + RTrim(MNFe.Identificacao_Documento) as Serie 
-					, Replace(Replace(Replace(MV.Tipo_operacao, 'VND', '01'), 'Dev', '02'), 'Can', '03') as TipoNF 
-					, Replace(Replace(Replace(Convert(VarChar(16),MNFe.[Data_Emissao],120),' ',''),'-',''),':',''), 
-MP1.[Codigo_Vendedor], c.CNPJ_Sem_Literais, F.UF, F.Cep, C.Estado, C.CEP, 'CIF' as TipoFrete, '07' as Dias, c.CPF_Sem_Literais, c.fisica_juridica 
-FROM View_Movimento_Prod_serv as MP1 inner join [View_Movimento_NFe_Relatorio] as MNFe on MP1.ordem_movimento = MNFe.ordem_movimento 
-inner join movimento as MV on MV.ordem = MP1.Ordem_Movimento inner join Filiais as F on MV.Ordem_Filial = F.Ordem 
-inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem  inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
-where codigo_fabricante = '156' and MV.Sequencia = MNFe.Sequencia and F.codigo = '1'
- and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' and mv.desefetivado_estoque = '0'
-and mp1.estoque_efetivado = '1' and mp1.efetivado_financeiro = '1' and mp1.Estoque_Desefetivado = '0' 
---- and MNFe.data_autorizacao between DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1)
+SELECT distinct '02' as TiReg, '01' as TiFat, mvFiscais.Numero
+,REPLICATE('0', 3 - LEN(mvFiscais.Serie)) + RTrim(mvFiscais.Serie) as Serie 
+, Replace(Replace(Replace(MV.Tipo_operacao, 'VND', '01'), 'Dev', '02'), 'Can', '03') as TipoNF 
+, Replace(Replace(Replace(Convert(VarChar(16),mvFiscais.Data_Emissao,120),' ',''),'-',''),':',''), 
+fun.Codigo, c.CNPJ_Sem_Literais, F.UF, F.Cep, C.Estado, C.CEP, 'CIF' as TipoFrete, '07' as Dias, c.CPF_Sem_Literais, c.fisica_juridica 
+FROM Movimento_Prod_serv as MP1 
+inner join movimento as MV on MV.ordem = MP1.Ordem_Movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem 
+inner join funcionarios as fun on fun.ordem = mp1.ordem_vendedor
+inner join Cli_For as C on MV.Ordem_Cli_For = C.Ordem 
+inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
+inner join Movimento_documentos_fiscais as mvFiscais on mv.ordem = mvFiscais.ordem_movimento
+where F.codigo = '1' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mp1.estoque_efetivado = '1' 
+and mv.efetivado_financeiro = '1' and mp1.Estoque_Desefetivado = '0' 
+and mp1.Data_efetivacao_estoque between DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1)
 and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98' and p.inativo = '0'
 and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and C.CEP <> '' and C.CEP <>'0'
-order by MNFe.Numero
+order by mvFiscais.Numero
 
 
+--- SELECT top 50 MNFe.[Ordem_Movimento],MNFe.[Data],MNFe.[Sequencia],MNFe.[Cli_For_Codigo],MNFe.[Preco_Final_Somado],MNFe.[Numero],MNFe.[Data_Emissao],MNFe.[Identificacao_Documento] as serie,MNFe.[Tipo_Documento]  FROM [dbo].[View_Movimento_NFe_Relatorio] as MNFe
 
 /*
 SELECT distinct '02' as TiReg, '01' as TiFat, MNFe.Numero, REPLICATE('0', 3 - LEN(MNFe.Identificacao_Documento)) + RTrim(MNFe.Identificacao_Documento) as Serie 

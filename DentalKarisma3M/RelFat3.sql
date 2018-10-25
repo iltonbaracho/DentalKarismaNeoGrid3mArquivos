@@ -1,4 +1,6 @@
-use s9_real
+use s9_real on mpDev.ordem_movimento = MNFe.ordem_movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem  
+inner join Prod_Serv as p on p.ordem = mp1.or
 
 select DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 ,GETDATE())) +1 as Dia1Mes, eomonth(getdate(), -1) as DiaFimMes, mp1.codigo_barras, mp1.Nome
 

@@ -42,20 +42,25 @@ public class GeraArqVendas {
         DataHoraFormatos dataHora = new DataHoraFormatos();
 
         try {
-  String nfVen = "SELECT distinct '02' as TiReg, '01' as TiFat, MNFe.Numero, "
-+ "REPLICATE('0', 3 - LEN(MNFe.Identificacao_Documento)) + RTrim(MNFe.Identificacao_Documento) as Serie \n" +
-", Replace(Replace(Replace(MV.Tipo_operacao, 'VND', '01'), 'Dev', '02'), 'Can', '03') as TipoNF \n" +
-", Replace(Replace(Replace(Convert(VarChar(16),MNFe.[Data_Emissao],120),' ',''),'-',''),':',''), \n" +
-"MP1.[Codigo_Vendedor], c.CNPJ_Sem_Literais, F.UF, F.Cep, C.Estado, C.CEP, 'CIF' as TipoFrete, '07' as Dias, c.CPF_Sem_Literais, c.fisica_juridica \n" +
-"FROM View_Movimento_Prod_serv as MP1 inner join [View_Movimento_NFe_Relatorio] as MNFe on MP1.ordem_movimento = MNFe.ordem_movimento \n" +
-"inner join movimento as MV on MV.ordem = MP1.Ordem_Movimento inner join Filiais as F on MV.Ordem_Filial = F.Ordem \n" +
-"inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem  inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv \n" +
-"where codigo_fabricante = '156' and MV.Sequencia = MNFe.Sequencia and F.codigo = '1' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' \n" +
-"and mv.desefetivado_estoque = '0' and mp1.estoque_efetivado = '1' and mp1.efetivado_financeiro = '1' and mp1.Estoque_Desefetivado = '0' \n" +
-"and MNFe.data_autorizacao between DATEADD(DAY, -90 , GETDATE()) AND getdate()" +
-" and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98' and p.inativo = '0'\n" +
-"and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and C.CEP <> '' and C.CEP <>'0'\n" +
-"order by MNFe.Numero";
+  String nfVen = "SELECT distinct '02' as TiReg, '01' as TiFat, mvFiscais.Numero " +
+",REPLICATE('0', 3 - LEN(mvFiscais.Serie)) + RTrim(mvFiscais.Serie) as Serie " +
+", Replace(Replace(Replace(MV.Tipo_operacao, 'VND', '01'), 'Dev', '02'), 'Can', '03') as TipoNF " +
+", Replace(Replace(Replace(Convert(VarChar(16),mvFiscais.Data_Emissao,120),' ',''),'-',''),':',''), " +
+"fun.Codigo, c.CNPJ_Sem_Literais, F.UF, F.Cep, C.Estado, C.CEP, 'CIF' as TipoFrete, '07' as Dias, c.CPF_Sem_Literais, c.fisica_juridica " +
+"FROM Movimento_Prod_serv as MP1 " +
+"inner join movimento as MV on MV.ordem = MP1.Ordem_Movimento " +
+"inner join Filiais as F on MV.Ordem_Filial = F.Ordem " +
+"inner join funcionarios as fun on fun.ordem = mp1.ordem_vendedor " +
+"inner join Cli_For as C on MV.Ordem_Cli_For = C.Ordem " +
+"inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv " +
+"inner join Movimento_documentos_fiscais as mvFiscais on mv.ordem = mvFiscais.ordem_movimento " +
+"where F.codigo = '1' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' " +
+"and mv.desefetivado_estoque = '0' and mp1.estoque_efetivado = '1' " +
+"and mv.efetivado_financeiro = '1' and mp1.Estoque_Desefetivado = '0' " +
+"and mp1.Data_efetivacao_estoque between DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) " +
+"and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98' and p.inativo = '0' " +
+"and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and C.CEP <> '' and C.CEP <>'0' " +
+"order by mvFiscais.Numero ";
 
             // Objeto de conversação Statement  
             pstNfVen = conexao.prepareStatement(nfVen);
@@ -102,24 +107,28 @@ public class GeraArqVendas {
                         + ufEmissorVenda + "|" + cepEmissorVenda + "|" + ufDestinatarioVenda
                         + "|" + cepDestinatarioVenda + "|" + tipoFreteVenda + "|" + diasPagamentoVenda);
 
-                String itVen = "SELECT distinct '03' as TiReg, MNFe.Numero,"
-                        + " REPLICATE('0', 3 - LEN(MNFe.Identificacao_Documento)) + RTrim(MNFe.Identificacao_Documento) as Serie "
-                        + ", Replace(Replace(Replace(MV.Tipo_operacao, 'VND', '01'), 'Dev', '02'), 'Can', '03') as TipoNF , MP1.[Codigo]"
-                        + ",format(MP1.[Quantidade], '#.00000'), Replace(MP1.[Preco_Unitario], ',','.'),'N' as Boni"
-                        + ",Replace(MP1.[Preco_Total_Sem_Desconto], ',','.'),Replace(MP1.[Preco_Total_Com_Desconto], ',','.')"
-                        + ",Replace(MP1.[IPI_Valor], ',','.'), Replace(MP1.[PIS_Normal_Valor], ',','.'), Replace(MP1.[ICMS_Subst_Valor], ',','.')"
-                        + ",Replace(MP1.[ICMS_Normal_Valor], ',','.'), Replace(MP1.[Desconto_Valor], ',','.')"
-                        + " FROM View_Movimento_Prod_serv as MP1 inner join [View_Movimento_NFe_Relatorio] as MNFe on MP1.ordem_movimento = MNFe.ordem_movimento"
-                        + " inner join movimento as MV on MV.ordem = MP1.Ordem_Movimento inner join Filiais as F on MV.Ordem_Filial = F.Ordem"
-                        + " inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem  inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv"
-                        + " where codigo_fabricante = '156' and MV.Sequencia = MNFe.Sequencia "
-                        + " and MNFe.Numero = '"
-                        + numNFVenda
-                        + "' and F.codigo = '1' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0'"
-                        + " and mv.desefetivado_estoque = '0' and mp1.estoque_efetivado = '1' and mp1.efetivado_financeiro = '1' and mp1.Estoque_Desefetivado = '0'"
-                        + " and MNFe.data_autorizacao between DATEADD(DAY, -90 , GETDATE()) AND getdate()"
-                        + " and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98' and p.inativo = '0' \n" +
-" and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')";
+                String itVen = "SELECT '03' as TiReg, mvFiscais.Numero " +
+",REPLICATE('0', 3 - LEN(mvFiscais.Serie)) + RTrim(mvFiscais.Serie) as Serie " +
+", Replace(Replace(Replace(MV.Tipo_operacao, 'VND', '01'), 'Dev', '02'), 'Can', '03') as TipoNF, P.Codigo " +
+",format(MP1.Quantidade, '#.00000'),Replace(MP1.Preco_Unitario, ',','.') " +
+",'N' as Boni, Replace(MP1.Preco_Total_Sem_Desconto, ',','.') " +
+", Replace(MP1.Preco_Total_Com_Desconto, ',','.'), Replace(MP1.IPI_Valor, ',','.'), " +
+"Replace(MP1.PIS_Normal_Valor, ',','.'), Replace(MP1.ICMS_Subst_Valor, ',','.') " +
+", Replace(MP1.ICMS_Normal_Valor, ',','.'), Replace(MP1.Desconto_Valor, ',','.') " +
+"FROM Movimento_Prod_serv as MP1 " +
+"inner join movimento as MV on MV.ordem = MP1.Ordem_Movimento " +
+"inner join Filiais as F on MV.Ordem_Filial = F.Ordem " +
+"inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem " +
+"inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv " +
+"inner join Movimento_documentos_fiscais as mvFiscais on mv.ordem = mvFiscais.ordem_movimento " +
+"where F.codigo = '1' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' " +
+" and mvFiscais.Numero = '"+numNFVenda+ 
+"' and mv.desefetivado_estoque = '0' and mp1.estoque_efetivado = '1' " +
+"and mv.efetivado_financeiro = '1' and mp1.Estoque_Desefetivado = '0' " +
+"and mp1.Data_efetivacao_estoque between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) " +
+"and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98' " +
+"and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0') " +
+"order by mp1.Ordem_prod_serv ";
 
                 pstItVen = conexao.prepareStatement(itVen);
                 rsItVen = pstItVen.executeQuery();

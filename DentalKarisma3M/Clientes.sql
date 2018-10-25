@@ -1,7 +1,7 @@
 
 USE S9_REAL
 
-select distinct mp.data_efetivacao_estoque, c.fisica_juridica, c.CEP, c.Estado,
+select distinct c.fisica_juridica, c.CEP, c.Estado,
                 Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace( Replace(Replace(Replace(Replace(SubString
                 (c.Cidade,1,50),'é','e'),'á','a'),'ã','a'),'ç','c'),'#',''),'(', ''),')', ' '),'ó', 'o'),':', ' '),'.', ' '),'í', 'i'),',', ' '),
 				Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace( Replace(Replace(Replace(Replace(SubString
@@ -16,9 +16,9 @@ select distinct mp.data_efetivacao_estoque, c.fisica_juridica, c.CEP, c.Estado,
 				 from cli_for as c inner join Movimento as mv on c.ordem = mv.ordem_cli_for 
 				 inner join Movimento_Prod_serv as mp on mv.ordem = mp.Ordem_Movimento 
                  inner join prod_serv as p on mp.Ordem_Prod_Serv = p.ordem
-				 inner join View_Estoque_Atual_Filial_Prod_Serv as e on e.ordem_prod_serv = p.ordem
-                 where ordem_fabricante = '98' and e.codigo_filial =1 and c.cep <> '' and c.cep <> '0'
-                 ---and mp.data_efetivacao_estoque between DATEADD(DAY, -390 , GETDATE()) AND getdate()
+				 inner join Filiais as F on MV.Ordem_Filial = F.Ordem 
+				 where p.ordem_fabricante = '98' and F.codigo = '1' and c.cep <> '' and c.cep <> '0'
+                 and mp.data_efetivacao_estoque between DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1)
 				 and c.codigo > 0
 				 and (c.cnpj_sem_literais <> '' or c.cpf_sem_literais <> '') and (c.cnpj_sem_literais <> '0' or c.cpf_sem_literais <> '0')
 				 and cpf_sem_literais not in ('0')

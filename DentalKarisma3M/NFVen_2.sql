@@ -1,0 +1,52 @@
+use S9_Real
+
+
+SELECT 
+--- p.codigo, p.codigo_barras, 
+p.Nome, sum(mp1.quantidade) 
+from Movimento_Prod_serv mp1 inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
+
+inner join movimento as MV on MV.ordem = MP1.Ordem_Movimento inner join Filiais as F on MV.Ordem_Filial = F.Ordem 
+inner join Cli_For as C on MV.Ordem_Cli_For = C.Ordem  inner join Movimento_documentos_fiscais
+as mvFiscais on mv.ordem = mvFiscais.ordem_movimento
+where MV.Sequencia = mv.Sequencia and F.codigo = '1' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+
+--- and p.codigo ='7209' and mp1.estoque_desefetivado = 'false'
+
+and mv.desefetivado_estoque = '0' and mp1.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' and mp1.Estoque_Desefetivado = '0' 
+and mv.Data_efetivado_estoque between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
+--- and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') 
+and p.ordem_fabricante = '98'
+and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
+and p.codigo ='7209'
+
+--- and mp1.Data_efetivacao_estoque > 01/07/2018
+and mp1.Data_efetivacao_estoque between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
+group by p.Nome;
+
+
+--- SELECT top 5 * from Prod_serv;numero_nota_fiscal <> '0'
+--- SELECT top 10 * from Movimento_documentos_fiscais
+--- where  tipo_operacao = 'VND';
+--- SELECT top 5 * from Movimento_Prod_serv;
+
+/*
+SELECT
+mv.Sequencia, '03' as TiReg, mvFiscais.Numero, 
+p.codigo_barras, p.Nome, mp1.quantidade
+,mvFiscais.Serie as Serie 
+, Replace(Replace(Replace(MV.Tipo_operacao, 'VND', '01'), 'Dev', '02'), 'Can', '03') as TipoNF , P.[Codigo]
+,format(MP1.[Quantidade], '#.00000'), Replace(MP1.[Preco_Unitario], ',','.'),'N' as Boni, mp1.Ordem_prod_serv
+,Replace(MP1.[Preco_Total_Sem_Desconto], ',','.'),Replace(MP1.[Preco_Total_Com_Desconto], ',','.'), Replace(MP1.[IPI_Valor], ',','.'), 
+Replace(MP1.[PIS_Normal_Valor], ',','.'), Replace(MP1.[ICMS_Subst_Valor], ',','.'), Replace(MP1.[ICMS_Normal_Valor], ',','.'), Replace(MP1.[Desconto_Valor], ',','.') 
+FROM Movimento_Prod_serv as MP1 inner join movimento as MV on MV.ordem = MP1.Ordem_Movimento inner join Filiais as F on MV.Ordem_Filial = F.Ordem 
+inner join Cli_For as C on MV.Ordem_Cli_For = C.Ordem  inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv inner join Movimento_documentos_fiscais
+as mvFiscais on mv.ordem = mvFiscais.ordem_movimento
+where MV.Sequencia = mv.Sequencia and F.codigo = '1' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mp1.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' and mp1.Estoque_Desefetivado = '0' 
+and mv.Data_efetivado_estoque between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
+and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98'
+and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
+and p.codigo ='7209'
+order by mp1.Ordem_prod_serv;
+*/
