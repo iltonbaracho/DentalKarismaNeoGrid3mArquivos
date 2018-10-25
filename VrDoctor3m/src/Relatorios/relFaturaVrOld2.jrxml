@@ -1,64 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b30475ae-0540-479f-96fc-7e43d27d3591">
 	<property name="ireport.zoom" value="2.3579476910000037"/>
-	<property name="ireport.x" value="659"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="96"/>
 	<queryString>
 		<![CDATA[use s9_real
 
 select DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 ,GETDATE())) +1 as Dia1Mes, eomonth(getdate(), -1) as DiaFimMes
-, p.codigo_barras, p.codigo_adicional1, p.Nome
+, mp1.codigo_barras, mp1.codigo_adicional1, mp1.Nome
 
 , isNull (( Select Sum(mpVnd.Quantidade)
-from Movimento_Prod_serv as mpVnd inner join movimento as MV on MV.ordem = mpVnd.Ordem_Movimento
-inner join Movimento_documentos_fiscais as mvFiscais on mpVnd.ordem_movimento = mvFiscais.ordem_movimento 
-inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem  
+from View_Movimento_Prod_serv as mpVnd inner join movimento as MV on MV.ordem = mpVnd.Ordem_Movimento
+inner join [View_Movimento_NFe_Relatorio] as MNFe on mpVnd.ordem_movimento = MNFe.ordem_movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem  
 inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
-where MV.Tipo_operacao = 'VND' and p.ordem_fabricante = '98' 
-and mpVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
+where MV.Tipo_operacao = 'VND' and mpVnd.Codigo_Fabricante = '156' and mpVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
 and F.codigo = '2'
-and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
-and mv.desefetivado_estoque = '0' and mpVnd.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' and mpVnd.Estoque_Desefetivado = '0' 
-and mvFiscais.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
+and MV.Sequencia = MNFe.Sequencia and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mpVnd.estoque_efetivado = '1' and mpVnd.efetivado_financeiro = '1' and mpVnd.Estoque_Desefetivado = '0' 
+and MNFe.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
 and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
 group by mpVnd.Ordem_prod_serv ), 0) QtdVend
 
 , isNull (( Select Sum(mpPreVnd.Preco_Final)
-from Movimento_Prod_serv as mpPreVnd inner join movimento as MV on MV.ordem = mpPreVnd.Ordem_Movimento
-inner join Movimento_documentos_fiscais as mvFiscais on mpPreVnd.ordem_movimento = mvFiscais.ordem_movimento 
-inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem  
+from View_Movimento_Prod_serv as mpPreVnd inner join movimento as MV on MV.ordem = mpPreVnd.Ordem_Movimento
+inner join [View_Movimento_NFe_Relatorio] as MNFe on mpPreVnd.ordem_movimento = MNFe.ordem_movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem  
 inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
-where MV.Tipo_operacao = 'VND' and p.ordem_fabricante = '98' and mpPreVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
+where MV.Tipo_operacao = 'VND' and mpPreVnd.Codigo_Fabricante = '156' and mpPreVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
 and F.codigo = '2'
-and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
-and mv.desefetivado_estoque = '0' and mpPreVnd.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' and mpPreVnd.Estoque_Desefetivado = '0' 
-and mvFiscais.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
+and MV.Sequencia = MNFe.Sequencia and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mpPreVnd.estoque_efetivado = '1' and mpPreVnd.efetivado_financeiro = '1' and mpPreVnd.Estoque_Desefetivado = '0' 
+and MNFe.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
 and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
 group by mpPreVnd.Ordem_prod_serv ), 0) PreVend 
  
 ,isnull (( Select Sum(mpDev.Quantidade)
-from Movimento_Prod_serv as mpDev inner join movimento as MV on MV.ordem = mpDev.Ordem_Movimento
-inner join Movimento_documentos_fiscais as mvFiscais on mpDev.ordem_movimento = mvFiscais.ordem_movimento 
-inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem  
+from View_Movimento_Prod_serv as mpDev inner join movimento as MV on MV.ordem = mpDev.Ordem_Movimento
+inner join [View_Movimento_NFe_Relatorio] as MNFe on mpDev.ordem_movimento = MNFe.ordem_movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem  
 inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
-where MV.Tipo_operacao = 'DEV' and p.ordem_fabricante = '98' and mpDev.Ordem_prod_serv=mp1.Ordem_prod_serv
+where MV.Tipo_operacao = 'DEV' and mpDev.Codigo_Fabricante = '156' and mpDev.Ordem_prod_serv=mp1.Ordem_prod_serv
 and F.codigo = '2'
-and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
-and mv.desefetivado_estoque = '0' and mpDev.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' and mpDev.Estoque_Desefetivado = '0' 
-and mvFiscais.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
+and MV.Sequencia = MNFe.Sequencia and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mpDev.estoque_efetivado = '1' and mpDev.efetivado_financeiro = '1' and mpDev.Estoque_Desefetivado = '0' 
+and MNFe.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
 and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
 group by mpDev.Ordem_prod_serv ), 0) QtdDev
 
 , ( isNull (( Select Sum(mpPreVnd.Preco_Final)
-from Movimento_Prod_serv as mpPreVnd inner join movimento as MV on MV.ordem = mpPreVnd.Ordem_Movimento
-inner join Movimento_documentos_fiscais as mvFiscais on mpPreVnd.ordem_movimento = mvFiscais.ordem_movimento 
-inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem  
+from View_Movimento_Prod_serv as mpPreVnd inner join movimento as MV on MV.ordem = mpPreVnd.Ordem_Movimento
+inner join [View_Movimento_NFe_Relatorio] as MNFe on mpPreVnd.ordem_movimento = MNFe.ordem_movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem  
 inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
-where MV.Tipo_operacao = 'DEV' and p.ordem_fabricante = '98' and mpPreVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
+where MV.Tipo_operacao = 'DEV' and mpPreVnd.Codigo_Fabricante = '156' and mpPreVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
 and F.codigo = '2'
-and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
-and mv.desefetivado_estoque = '0' and mpPreVnd.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' and mpPreVnd.Estoque_Desefetivado = '0' 
-and mvFiscais.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
+and MV.Sequencia = MNFe.Sequencia and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mpPreVnd.estoque_efetivado = '1' and mpPreVnd.efetivado_financeiro = '1' and mpPreVnd.Estoque_Desefetivado = '0' 
+and MNFe.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
 and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
 group by mpPreVnd.Ordem_prod_serv ), 0)
  ) PreDev 
@@ -66,73 +65,68 @@ group by mpPreVnd.Ordem_prod_serv ), 0)
 , '0,00' as QtdBoni, '0,00' as VlrBoni
 
 ,( isNull (( Select Sum(mpVnd.Quantidade)
-from Movimento_Prod_serv as mpVnd inner join movimento as MV on MV.ordem = mpVnd.Ordem_Movimento
-inner join Movimento_documentos_fiscais as mvFiscais on mpVnd.ordem_movimento = mvFiscais.ordem_movimento 
-inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem  
+from View_Movimento_Prod_serv as mpVnd inner join movimento as MV on MV.ordem = mpVnd.Ordem_Movimento
+inner join [View_Movimento_NFe_Relatorio] as MNFe on mpVnd.ordem_movimento = MNFe.ordem_movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem  
 inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
-where MV.Tipo_operacao = 'VND' and p.ordem_fabricante = '98' and mpVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
+where MV.Tipo_operacao = 'VND' and mpVnd.Codigo_Fabricante = '156' and mpVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
 and F.codigo = '2'
-and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
-and mv.desefetivado_estoque = '0' and mpVnd.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' and mpVnd.Estoque_Desefetivado = '0' 
-and mvFiscais.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
+and MV.Sequencia = MNFe.Sequencia and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mpVnd.estoque_efetivado = '1' and mpVnd.efetivado_financeiro = '1' and mpVnd.Estoque_Desefetivado = '0' 
+and MNFe.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
 and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
 group by mpVnd.Ordem_prod_serv ), 0) - 
 isNull(( Select Sum(mpDev.Quantidade)
-from Movimento_Prod_serv as mpDev inner join movimento as MV on MV.ordem = mpDev.Ordem_Movimento
-inner join Movimento_documentos_fiscais as mvFiscais on mpDev.ordem_movimento = mvFiscais.ordem_movimento 
-inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem  
+from View_Movimento_Prod_serv as mpDev inner join movimento as MV on MV.ordem = mpDev.Ordem_Movimento
+inner join [View_Movimento_NFe_Relatorio] as MNFe on mpDev.ordem_movimento = MNFe.ordem_movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem  
 inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
-where MV.Tipo_operacao = 'DEV' and p.ordem_fabricante = '98' and mpDev.Ordem_prod_serv=mp1.Ordem_prod_serv
+where MV.Tipo_operacao = 'DEV' and mpDev.Codigo_Fabricante = '156' and mpDev.Ordem_prod_serv=mp1.Ordem_prod_serv
 and F.codigo = '2'
-and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
-and mv.desefetivado_estoque = '0' and mpDev.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' and mpDev.Estoque_Desefetivado = '0' 
-and mvFiscais.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
+and MV.Sequencia = MNFe.Sequencia and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mpDev.estoque_efetivado = '1' and mpDev.efetivado_financeiro = '1' and mpDev.Estoque_Desefetivado = '0' 
+and MNFe.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
 and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
 group by mpDev.Ordem_prod_serv ), 0)
 )TotQtd
 
 , ( isNull (( Select Sum(mpPreVnd.Preco_Final)
-from Movimento_Prod_serv as mpPreVnd inner join movimento as MV on MV.ordem = mpPreVnd.Ordem_Movimento
-inner join Movimento_documentos_fiscais as mvFiscais on mpPreVnd.ordem_movimento = mvFiscais.ordem_movimento 
-inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem  
+from View_Movimento_Prod_serv as mpPreVnd inner join movimento as MV on MV.ordem = mpPreVnd.Ordem_Movimento
+inner join [View_Movimento_NFe_Relatorio] as MNFe on mpPreVnd.ordem_movimento = MNFe.ordem_movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem  
 inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
-where MV.Tipo_operacao = 'VND' and p.ordem_fabricante = '98' and mpPreVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
+where MV.Tipo_operacao = 'VND' and mpPreVnd.Codigo_Fabricante = '156' and mpPreVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
 and F.codigo = '2'
-and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
-and mv.desefetivado_estoque = '0' and mpPreVnd.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' and mpPreVnd.Estoque_Desefetivado = '0' 
-and mvFiscais.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
+and MV.Sequencia = MNFe.Sequencia and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mpPreVnd.estoque_efetivado = '1' and mpPreVnd.efetivado_financeiro = '1' and mpPreVnd.Estoque_Desefetivado = '0' 
+and MNFe.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
 and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
 group by mpPreVnd.Ordem_prod_serv ), 0) -
 isNull (( Select Sum(mpPreVnd.Preco_Final)
-from Movimento_Prod_serv as mpPreVnd inner join movimento as MV on MV.ordem = mpPreVnd.Ordem_Movimento
-inner join Movimento_documentos_fiscais as mvFiscais on mpPreVnd.ordem_movimento = mvFiscais.ordem_movimento 
-inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem  
+from View_Movimento_Prod_serv as mpPreVnd inner join movimento as MV on MV.ordem = mpPreVnd.Ordem_Movimento
+inner join [View_Movimento_NFe_Relatorio] as MNFe on mpPreVnd.ordem_movimento = MNFe.ordem_movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem  
 inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
-where MV.Tipo_operacao = 'DEV' and p.ordem_fabricante = '98' and mpPreVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
+where MV.Tipo_operacao = 'DEV' and mpPreVnd.Codigo_Fabricante = '156' and mpPreVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
 and F.codigo = '2'
-and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
-and mv.desefetivado_estoque = '0' and mpPreVnd.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' and mpPreVnd.Estoque_Desefetivado = '0' 
-and mvFiscais.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
+and MV.Sequencia = MNFe.Sequencia and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mpPreVnd.estoque_efetivado = '1' and mpPreVnd.efetivado_financeiro = '1' and mpPreVnd.Estoque_Desefetivado = '0' 
+and MNFe.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
 and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
 group by mpPreVnd.Ordem_prod_serv ), 0)
  ) TotPre 
  
-FROM Movimento_Prod_serv as MP1 
-inner join movimento as MV on MV.ordem = MP1.Ordem_Movimento 
-inner join Filiais as F on MV.Ordem_Filial = F.Ordem 
-inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem 
-inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
-inner join Movimento_documentos_fiscais as mvFiscais on mv.ordem = mvFiscais.ordem_movimento
- 
-where F.codigo = '2' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
-and mv.desefetivado_estoque = '0' and mp1.estoque_efetivado = '1' 
-and mv.efetivado_financeiro = '1' and mp1.Estoque_Desefetivado = '0'
-and mvFiscais.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
-and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98'
-and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
+ from View_Movimento_Prod_serv as mp1  inner join [View_Movimento_NFe_Relatorio] as MNFe on MP1.ordem_movimento = MNFe.ordem_movimento
+ inner join movimento as MV on MV.ordem = MP1.Ordem_Movimento inner join Filiais as F on MV.Ordem_Filial = F.Ordem
+ inner join [View_Cli_For_Movimento] as C on MV.[Ordem_Cli_For] = C.Ordem inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv
 
-group by mp1.Ordem_prod_serv, p.Nome, p.codigo_barras, p.codigo_adicional1
-order by mp1.Ordem_prod_serv, p.codigo_barras]]>
+ where codigo_fabricante = '156' and MV.Sequencia = MNFe.Sequencia and F.codigo = '2' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mp1.estoque_efetivado = '1' and mp1.efetivado_financeiro = '1' and mp1.Estoque_Desefetivado = '0' 
+and MNFe.data_autorizacao between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) 
+and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
+
+group by mp1.Ordem_prod_serv, mp1.Nome, mp1.codigo_barras, mp1.codigo_adicional1
+order by mp1.Ordem_prod_serv, mp1.codigo_barras]]>
 	</queryString>
 	<field name="Dia1Mes" class="java.sql.Timestamp"/>
 	<field name="DiaFimMes" class="java.sql.Date"/>
@@ -148,9 +142,6 @@ order by mp1.Ordem_prod_serv, p.codigo_barras]]>
 	<field name="TotQtd" class="java.math.BigDecimal"/>
 	<field name="TotPre" class="java.math.BigDecimal"/>
 	<variable name="TotalGeral" class="java.lang.Double" resetType="Column" calculation="Sum">
-		<variableExpression><![CDATA[$F{TotPre}]]></variableExpression>
-	</variable>
-	<variable name="GeralTotais" class="java.lang.Double" calculation="Sum">
 		<variableExpression><![CDATA[$F{TotPre}]]></variableExpression>
 	</variable>
 	<background>
@@ -173,6 +164,13 @@ order by mp1.Ordem_prod_serv, p.codigo_barras]]>
 				<textFieldExpression><![CDATA[$F{DiaFimMes}]]></textFieldExpression>
 			</textField>
 			<staticText>
+				<reportElement x="0" y="0" width="225" height="42" uuid="3773c9c5-6b65-4d51-aa77-fc0ffad67436"/>
+				<textElement>
+					<font fontName="Arial Black" size="26"/>
+				</textElement>
+				<text><![CDATA[VR DOCTOR]]></text>
+			</staticText>
+			<staticText>
 				<reportElement x="321" y="0" width="72" height="20" uuid="74e406b8-7fda-449b-92dc-f788578f5b1c"/>
 				<textElement>
 					<font size="12"/>
@@ -182,13 +180,6 @@ order by mp1.Ordem_prod_serv, p.codigo_barras]]>
 			<staticText>
 				<reportElement x="457" y="0" width="20" height="20" uuid="2393e565-bc88-4dc2-a597-5cceb8f728d6"/>
 				<text><![CDATA[até]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="0" y="0" width="225" height="42" uuid="c5a9e32a-77f7-4cfe-946d-84550d7122e4"/>
-				<textElement>
-					<font fontName="Arial Black" size="26"/>
-				</textElement>
-				<text><![CDATA[VR DOCTOR]]></text>
 			</staticText>
 		</band>
 	</title>
@@ -554,51 +545,36 @@ order by mp1.Ordem_prod_serv, p.codigo_barras]]>
 		</band>
 	</detail>
 	<columnFooter>
-		<band height="2" splitType="Stretch"/>
+		<band height="1" splitType="Stretch"/>
 	</columnFooter>
 	<pageFooter>
-		<band height="18" splitType="Stretch">
+		<band height="22" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="0" width="80" height="18" uuid="4bd92917-8419-4a58-aa27-2d7737b24ee7"/>
+				<reportElement x="0" y="2" width="80" height="20" uuid="4bd92917-8419-4a58-aa27-2d7737b24ee7"/>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA["Page   "  +   $V{PAGE_NUMBER}+" of"]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
-				<reportElement x="80" y="0" width="40" height="18" uuid="41f3c8ae-6bf5-4901-b224-65e6ff54e65b"/>
+				<reportElement x="80" y="2" width="40" height="20" uuid="41f3c8ae-6bf5-4901-b224-65e6ff54e65b"/>
 				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="375" y="0" width="80" height="18" uuid="4ee97555-2f4d-44b9-86a0-0b225af08bce"/>
-				<textElement textAlignment="Right">
-					<font size="12" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Total Página:]]></text>
-			</staticText>
 			<textField pattern="¤ #,##0.00">
-				<reportElement x="455" y="0" width="100" height="18" uuid="d172ce64-09a5-44a5-9e43-ced848c88c0e"/>
+				<reportElement x="455" y="0" width="100" height="20" uuid="d172ce64-09a5-44a5-9e43-ced848c88c0e"/>
 				<textElement textAlignment="Right">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{TotalGeral}]]></textFieldExpression>
 			</textField>
+			<staticText>
+				<reportElement x="377" y="0" width="80" height="20" uuid="4ee97555-2f4d-44b9-86a0-0b225af08bce"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Página:]]></text>
+			</staticText>
 		</band>
 	</pageFooter>
 	<summary>
-		<band height="21" splitType="Stretch">
-			<textField pattern="¤ #,##0.00">
-				<reportElement x="455" y="0" width="100" height="20" uuid="0a3813ce-3983-4205-9a0c-d1d0bc045c17"/>
-				<textElement textAlignment="Right">
-					<font size="12" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$V{GeralTotais}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="375" y="1" width="80" height="20" uuid="ce680c3a-5860-4688-be98-fd67a44342cc"/>
-				<textElement textAlignment="Right">
-					<font size="12" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Total Geral:]]></text>
-			</staticText>
-		</band>
+		<band height="1" splitType="Stretch"/>
 	</summary>
 </jasperReport>
