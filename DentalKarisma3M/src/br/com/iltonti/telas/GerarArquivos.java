@@ -19,8 +19,8 @@ public class GerarArquivos {
     public static void main(String[] args) throws SQLException, InterruptedException {
         
         // Gerar o relatorio PDF
-        ReportUtils geraRelFaturamento = new ReportUtils();
-        geraRelFaturamento.gerarRelFatu();
+        // ReportUtils geraRelFaturamento = new ReportUtils();
+        //geraRelFaturamento.gerarRelFatu();
         
         //String mensagem1 = "Programa Arq3M em execução! Pressione OK e aguarde a mensagem de Fim !";
         //JOptionPane.showMessageDialog(null, mensagem1);

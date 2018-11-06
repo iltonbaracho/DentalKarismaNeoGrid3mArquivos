@@ -56,16 +56,17 @@ public class GeraArqClientes {
                 + " inner join prod_serv as p on mp.Ordem_Prod_Serv = p.ordem"
                 + " inner join Filiais as F on MV.Ordem_Filial = F.Ordem "
                 + " where p.ordem_fabricante = '98' and F.codigo = '1' and c.cep <> '' and c.cep <> '0'"
-                + " and mp.data_efetivacao_estoque between DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) "
+                + " and mp.data_efetivacao_estoque between DATEADD(DAY, -1 , GETDATE()) AND getdate() "
                 + " and c.codigo > 0 and  (c.cnpj_sem_literais <> '' or c.cpf_sem_literais <> '') and (c.cnpj_sem_literais <> '0' or c.cpf_sem_literais <> '0')"
                 + "and cpf_sem_literais not in ('0') order by 7";
+        //DATEADD(DAY, -1 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) "
         try {
             // Objeto de conversação Statement  
             pst = conexao.prepareStatement(sql1);
             //Tabela temporária ResultSet    
             rs = pst.executeQuery();
             // FileWriter para gerar arquivo no caminho especificado 
-            FileWriter arqClientes = new FileWriter("C:\\Shop9\\Arq3M\\" + identificacao
+            FileWriter arqClientes = new FileWriter("C:\\NeoGridClient\\documents\\out\\" + identificacao
                     + "_" + cnpjEmissor + "_" + dataHora.dataHoraGravar + "01.txt");
             // PrintWriter pra escrever no arquivo (em texto!)  
             PrintWriter gravaArquivo = new PrintWriter(arqClientes);

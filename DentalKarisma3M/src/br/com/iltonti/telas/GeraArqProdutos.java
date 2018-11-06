@@ -52,7 +52,7 @@ public class GeraArqProdutos {
 "  inner join Filiais as F on e.Ordem_Filial = F.Ordem  " +
 "  where pc.Ordem_Tabela_Preco = '2' and p.inativo = '0'  " +
 "  and p.ordem_fabricante = '98' and F.codigo = '1' " +
-"  and mp.data_efetivacao_estoque between DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) " +
+"  and mp.data_efetivacao_estoque between DATEADD(DAY, -1 , GETDATE()) AND getdate() " +
 "  and p.codigo_adicional1 <> '' and p.codigo_adicional1 <> '0'" +
 "  order by p.codigo";
         try {
@@ -61,7 +61,7 @@ public class GeraArqProdutos {
             //Tabela temporária ResultSet    
             rs = pst.executeQuery();
             // FileWriter para gerar arquivo no caminho especificado 
-            FileWriter arqProdutos = new FileWriter("C:\\Shop9\\Arq3M\\" + identificacao
+            FileWriter arqProdutos = new FileWriter("C:\\NeoGridClient\\documents\\out\\" + identificacao
                     + "_" + cnpjEmissor + "_" + dataHora.dataHoraGravar + "01.txt");
             // PrintWriter pra escrever no arquivo (em texto!)  
             PrintWriter gravaArquivo = new PrintWriter(arqProdutos);
