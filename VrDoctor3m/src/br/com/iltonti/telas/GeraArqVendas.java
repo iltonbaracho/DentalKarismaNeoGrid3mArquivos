@@ -57,7 +57,7 @@ public class GeraArqVendas {
 "where F.codigo = '2' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' " +
 "and mv.desefetivado_estoque = '0' and mp1.estoque_efetivado = '1' " +
 "and mv.efetivado_financeiro = '1' and mp1.Estoque_Desefetivado = '0' " +
-"and mp1.Data_efetivacao_estoque between DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) " +
+"and mp1.Data_efetivacao_estoque between DATEADD(DAY, -1 , GETDATE()) AND getdate() " +
 "and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98' and p.inativo = '0' " +
 "and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and C.CEP <> '' and C.CEP <>'0' " +
 "order by mvFiscais.Numero";
@@ -68,7 +68,7 @@ public class GeraArqVendas {
             rsNfVen = pstNfVen.executeQuery();
             // PrintWriter pra escrever no arquivo (em texto!)
             try ( // FileWriter para gerar arquivo no caminho especificado
-                    FileWriter arqVendas = new FileWriter("C:\\Shop9\\Arq3M\\" + identificacao
+                    FileWriter arqVendas = new FileWriter("C:\\NeoGridClient\\documents\\out\\" + identificacao
                             + "_" + cnpjEmissor + "_" + dataHora.dataHoraGravar + "01.txt"); // PrintWriter pra escrever no arquivo (em texto!)
                     PrintWriter gravaArquivo = new PrintWriter(arqVendas)) {
                 //grava o cabeçalho do arquivo
@@ -124,7 +124,7 @@ public class GeraArqVendas {
 " and mvFiscais.Numero = '"+numNFVenda+ 
 "' and mv.desefetivado_estoque = '0' and mp1.estoque_efetivado = '1' " +
 "and mv.efetivado_financeiro = '1' and mp1.Estoque_Desefetivado = '0' " +
-"and mp1.Data_efetivacao_estoque between  DATEADD(DAY, -90 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) " +
+"and mp1.Data_efetivacao_estoque between  DATEADD(DAY, -1 , GETDATE()) AND getdate() " +
 "and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98' " +
 "and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0') " +
 "order by mp1.Ordem_prod_serv  ";
