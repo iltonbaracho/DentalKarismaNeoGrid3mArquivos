@@ -40,19 +40,19 @@ public class GeraArqProdutos {
         //Instancia Classe para criar formatos de datas para gravar arquivos
         DataHoraFormatos dataHora = new DataHoraFormatos();
 
-        String sql1 = "SELECT distinct p.Codigo, p.codigo_adicional1, p.Codigo, f.codigo " +
-"		, Replace(Replace(mp.Utilizou_preco_promocional ,'1','02'),'0','01') as promo " +
-"		, Replace(pc.preco, ',','.') as Preco " +
+        String sql1 = "SELECT distinct p.Codigo as Cod_I1, p.codigo_adicional1 as Cod_Pro2 " +
+"		, Replace(Replace(mp.Utilizou_preco_promocional ,'1','02'),'0','01') as TP_I3 " +
+"		, Replace(pc.preco, ',','.') as Preco4 " +
 "		, Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(SubString " +
-"		(p.Nome,1,50),'é','e'),'á','a'),'ã','a'),'ç','c'),'#',''),'(', ''),')', ' '),'ó', 'o'),':', ' '),'.', ' '),'í', 'i'),'+',' ') as NomePro " +
-"		, replace(replace(p.Inativo, '1','02'),'0','01')		" +
+"		(p.Nome,1,50),'é','e'),'á','a'),'ã','a'),'ç','c'),'#',''),'(', ''),')', ' '),'ó', 'o'),':', ' '),'.', ' '),'í', 'i'),'+',' ') as NomePro5 " +
+"		, replace(replace(p.Inativo, '1','02'),'0','01') as Sta6		" +
 "  FROM Prod_Serv as p inner join Movimento_Prod_serv as mp " +
 "  on p.ordem = mp.ordem_prod_serv inner join prod_serv_precos as pc on p.Ordem = pc.ordem_prod_serv " +
 "  inner join Estoque_Atual as E on e.ordem_prod_serv = p.ordem  " +
 "  inner join Filiais as F on e.Ordem_Filial = F.Ordem  " +
 "  where pc.Ordem_Tabela_Preco = '2' and p.inativo = '0'  " +
-"  and p.ordem_fabricante = '98' and F.codigo = '1' " +
-"  and mp.data_efetivacao_estoque between DATEADD(DAY, -1 , GETDATE()) AND getdate() " +
+"  and p.ordem_fabricante = '98' and F.codigo = '2' " +
+"  and mp.data_efetivacao_estoque between DATEADD(DAY, -"+ dataHora.diasGera + " , GETDATE()) AND getdate() " +
 "  and p.codigo_adicional1 <> '' and p.codigo_adicional1 <> '0'" +
 "  order by p.codigo";
         try {

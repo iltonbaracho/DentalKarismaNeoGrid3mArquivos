@@ -23,6 +23,7 @@ public class DataHoraFormatos {
         String anoMesDiadataHoraGravar = (anoMesDiaDataHora.format(dataHoraEmissao));
         String dataHoraGravar = (formataDataHora.format(dataHoraEmissao));
         String dataHoraGravarNumRelatorio = (formataDataHoraNumRelatorio.format(dataHoraEmissao));
+        Integer diasGera = 365;
       //  System.out.println(dataHoraGravar);
         //System.out.println(dataHoraGravarNumRelatorio);
 

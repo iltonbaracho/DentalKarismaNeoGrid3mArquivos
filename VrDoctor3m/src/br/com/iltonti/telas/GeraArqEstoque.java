@@ -45,7 +45,7 @@ public class GeraArqEstoque {
                 + "  FROM Estoque_Atual as E"
                 + " inner join Prod_Serv as p on e.ordem_prod_serv = p.ordem"
                 + "  where e.ordem_filial = 2 and p.Codigo <> '0' "
-                + " and e.Data_Alteracao between DATEADD(DAY, -1 , GETDATE()) AND getdate() "
+                + " and e.Data_Alteracao between DATEADD(DAY, -"+ dataHora.diasGera + " , GETDATE()) AND getdate() "
                 + " and p.ordem_fabricante = '98' and p.inativo = '0'"
                 + " and p.codigo_adicional1 <> '' and p.codigo_adicional1 <> '0' order by p.codigo";
         try {

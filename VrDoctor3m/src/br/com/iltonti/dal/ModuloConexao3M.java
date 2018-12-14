@@ -19,7 +19,7 @@ public class ModuloConexao3M {
         String driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 //        System.out.println("Ponto 1 Mod Con");
         // informações do banco de dados
-        String url = "jdbc:sqlserver://localhost;database=S9_Real;";
+        String url = "jdbc:sqlserver://192.168.0.250;database=S9_Real;";
         String user = "sa";
         String psswd = "Senha123";       
   //      System.out.println("Ponto 2 Mod Con");

@@ -27,18 +27,23 @@ public class GerarArquivos {
         GeraArqVendedores geraVendedores = new GeraArqVendedores();
         //JOptionPane.showMessageDialog(null, "Gerando ArqVendedores !");
         geraVendedores.gerarArquivo();
+        
         GeraArqClientes geraClientes = new GeraArqClientes();
         //JOptionPane.showMessageDialog(null, "Gerando ArqClientes !");
         geraClientes.gerarArquivo();
+        
         GeraArqEstoque geraEstoques = new GeraArqEstoque();
         //JOptionPane.showMessageDialog(null, "Gerando ArqEstoque !");
         geraEstoques.gerarArquivo();
+        
         GeraArqProdutos geraProdutos = new GeraArqProdutos();
         //JOptionPane.showMessageDialog(null, "Gerando ArqProdutos !");
         geraProdutos.gerarArquivo();
+        
         GeraArqVendas geraVendas = new GeraArqVendas();
         //JOptionPane.showMessageDialog(null, "Gerando ArqVendas !");
         geraVendas.gerarArquivo();
+        
         //String mensagem2 = "Programa Arq3M encerrado! Fim do Programa! Pressione os OK´s.";
         //JOptionPane.showMessageDialog(null, mensagem2);
         System.out.println("Fim do Programa");
