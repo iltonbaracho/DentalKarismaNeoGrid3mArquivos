@@ -43,11 +43,11 @@ public class GeraArqVendas {
 
         try {
   String nfVen = "SELECT distinct '02' as TiReg, '01' as TiFat, mvFiscais.Numero " +
-",REPLICATE('0', 3 - LEN(mvFiscais.Serie)) + RTrim(mvFiscais.Serie) as Serie " +
+", REPLICATE('0', 4 - LEN(mvFiscais.Serie)) " +
 ", Replace(Replace(Replace(MV.Tipo_operacao, 'VND', '01'), 'Dev', '02'), 'Can', '03') as TipoNF " +
 ", Replace(Replace(Replace(Convert(VarChar(16),mvFiscais.Data_Emissao,120),' ',''),'-',''),':',''), " +
 "fun.Codigo, c.CNPJ_Sem_Literais, F.UF, F.Cep, C.Estado, C.CEP, 'CIF' as TipoFrete, '07' as Dias, c.CPF_Sem_Literais, c.fisica_juridica " +
-"FROM Movimento_Prod_serv as MP1 " +
+" FROM Movimento_Prod_serv as MP1 " +
 "inner join movimento as MV on MV.ordem = MP1.Ordem_Movimento " +
 "inner join Filiais as F on MV.Ordem_Filial = F.Ordem " +
 "inner join funcionarios as fun on fun.ordem = mp1.ordem_vendedor " +
@@ -57,7 +57,7 @@ public class GeraArqVendas {
 "where F.codigo = '1' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' " +
 "and mv.desefetivado_estoque = '0' and mp1.estoque_efetivado = '1' " +
 "and mv.efetivado_financeiro = '1' and mp1.Estoque_Desefetivado = '0' " +
-"and mp1.Data_efetivacao_estoque between DATEADD(DAY, -1 , GETDATE()) AND getdate() " +
+"and mp1.Data_efetivacao_estoque between DATEADD(DAY, -"+ dataHora.diasGera + " , GETDATE()) AND getdate() " +
 "and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98' and p.inativo = '0' " +
 "and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and C.CEP <> '' and C.CEP <>'0' " +
 "order by mvFiscais.Numero ";
@@ -108,7 +108,7 @@ public class GeraArqVendas {
                         + "|" + cepDestinatarioVenda + "|" + tipoFreteVenda + "|" + diasPagamentoVenda);
 
                 String itVen = "SELECT '03' as TiReg, mvFiscais.Numero " +
-",REPLICATE('0', 3 - LEN(mvFiscais.Serie)) + RTrim(mvFiscais.Serie) as Serie " +
+",REPLICATE('0', 4 - LEN(mvFiscais.Serie)) " +
 ", Replace(Replace(Replace(MV.Tipo_operacao, 'VND', '01'), 'Dev', '02'), 'Can', '03') as TipoNF, P.Codigo " +
 ",format(MP1.Quantidade, '#.00000'),Replace(MP1.Preco_Unitario, ',','.') " +
 ",'N' as Boni, Replace(MP1.Preco_Total_Sem_Desconto, ',','.') " +
@@ -125,7 +125,7 @@ public class GeraArqVendas {
 " and mvFiscais.Numero = '"+numNFVenda+ 
 "' and mv.desefetivado_estoque = '0' and mp1.estoque_efetivado = '1' " +
 "and mv.efetivado_financeiro = '1' and mp1.Estoque_Desefetivado = '0' " +
-"and mp1.Data_efetivacao_estoque between  DATEADD(DAY, -1 , GETDATE()) AND getdate() " +
+"and mp1.Data_efetivacao_estoque between  DATEADD(DAY, -"+ dataHora.diasGera + " , GETDATE()) AND getdate() " +
 "and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98' " +
 "and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0') " +
 "order by mp1.Ordem_prod_serv ";

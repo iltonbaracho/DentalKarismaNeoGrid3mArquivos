@@ -38,6 +38,7 @@ public class GeraArqClientes {
         conexao = ModuloConexao3M.conector();
         //Instancia Classe para criar formatos de datas para gravar arquivos
         DataHoraFormatos dataHora = new DataHoraFormatos();
+        //System.out.println(dataHora.diasGera);
         String sql1 = "select distinct c.fisica_juridica, c.CEP, c.Estado,"
                 + "Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace( Replace(Replace(Replace(Replace(SubString"
                 + "(c.Cidade,1,50),'é','e'),'á','a'),'ã','a'),'ç','c'),'#',''),'(', ''),')', ' '),'ó', 'o'),':', ' '),'.', ' '),'í', 'i'),',', ' '),"                
@@ -56,10 +57,13 @@ public class GeraArqClientes {
                 + " inner join prod_serv as p on mp.Ordem_Prod_Serv = p.ordem"
                 + " inner join Filiais as F on MV.Ordem_Filial = F.Ordem "
                 + " where p.ordem_fabricante = '98' and F.codigo = '1' and c.cep <> '' and c.cep <> '0'"
-                + " and mp.data_efetivacao_estoque between DATEADD(DAY, -1 , GETDATE()) AND getdate() "
+                + " and mp.data_efetivacao_estoque between DATEADD(DAY, -"+ dataHora.diasGera + " , GETDATE()) AND getdate() "
                 + " and c.codigo > 0 and  (c.cnpj_sem_literais <> '' or c.cpf_sem_literais <> '') and (c.cnpj_sem_literais <> '0' or c.cpf_sem_literais <> '0')"
                 + "and cpf_sem_literais not in ('0') order by 7";
-        //DATEADD(DAY, -1 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) "
+        
+        //System.out.println(sql1);
+                 //DATEADD(DAY, -1 , GETDATE()) - Day(DATEADD(DAY, -90 , GETDATE())) +1 AND eomonth(getdate(), -1) "
+                 //DATEADD(DAY, -1 , GETDATE()) AND getdate()
         try {
             // Objeto de conversação Statement  
             pst = conexao.prepareStatement(sql1);
