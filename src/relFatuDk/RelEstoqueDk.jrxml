@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RelEstoqueDk" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c88c651d-ad39-476f-a8ba-b922f7315c98">
+	<property name="ireport.zoom" value="1.6105100000000017"/>
+	<property name="ireport.x" value="204"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[use S9_Real
+SELECT p.codigo, p.codigo_barras, p.codigo_adicional1, p.Nome
+, replace((case when Qtde_Estoque_Atual < 0 then 0 else qtde_estoque_atual end),',','.') as QtdeEstoque
+FROM Estoque_Atual as E
+inner join Prod_Serv as p on e.ordem_prod_serv = p.ordem
+where e.ordem_filial =1 and p.Codigo <> '0'
+and p.ordem_fabricante = '98' and p.inativo = '0'
+and p.codigo_adicional1 <> '' and p.codigo_adicional1 <> '0'
+order by p.codigo]]>
+	</queryString>
+	<field name="codigo" class="java.lang.String"/>
+	<field name="codigo_barras" class="java.lang.String"/>
+	<field name="codigo_adicional1" class="java.lang.String"/>
+	<field name="Nome" class="java.lang.String"/>
+	<field name="QtdeEstoque" class="java.lang.String"/>
+	<group name="codigo">
+		<groupExpression><![CDATA[$F{codigo}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="42" uuid="e0e40e9c-fe94-4123-88ad-de4391433c2f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial Black" size="26"/>
+				</textElement>
+				<text><![CDATA[DENTAL KARISMA]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="403" y="59" width="152" height="20" uuid="0116a3b0-1c3f-4c21-ac72-62f0db34e0de"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch">
+			<staticText>
+				<reportElement x="10" y="10" width="555" height="20" uuid="d72c53a9-be8c-4a99-a169-434a795905bd"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Relatório de Estoque Atual]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="15" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="59" height="15" uuid="570aebd4-f3af-46fb-9d01-1200e8e4e5fe"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Código]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="455" y="0" width="100" height="15" uuid="6f06b867-fb65-45c7-ad93-3227c6ce15e9"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[QtdeEstoque]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="59" y="0" width="89" height="15" uuid="6984c78b-7a7e-4028-8b2b-3560d8086180"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Código Barras]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="148" y="0" width="99" height="15" uuid="40a71aee-ee8f-4470-af4d-bc8492720e64"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Código SKU]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="247" y="0" width="208" height="15" uuid="62efd906-9584-494b-8821-d1d95ac13ef5"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nome]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="59" height="11" uuid="f538e4ab-d7d8-4cf4-a5ba-e9bb02bb6fc5"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codigo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="455" y="0" width="100" height="11" uuid="5aa572d6-f647-4360-a430-8bcd2038df06"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QtdeEstoque}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="59" y="0" width="89" height="11" uuid="f20aa547-b5c5-4341-b7fc-6c81f26256ba"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codigo_barras}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="148" y="0" width="99" height="11" uuid="ea991dbb-82ab-4cd5-b751-01f9281501a0"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codigo_adicional1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="247" y="0" width="208" height="11" uuid="b1e84e78-7320-4803-a981-31e896201bb0"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Nome}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b30475ae-0540-479f-96fc-7e43d27d3591">
+	<property name="ireport.zoom" value="2.3579476910000037"/>
+	<property name="ireport.x" value="317"/>
+	<property name="ireport.y" value="154"/>
+	<parameter name="dtIni" class="java.lang.String">
+		<defaultValueExpression><![CDATA[$P{dtIni};]]></defaultValueExpression>
+	</parameter>
+	<parameter name="dtFim" class="java.lang.String">
+		<defaultValueExpression><![CDATA[$P{dtFim};]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[use s9_real
+
+select $P{dtIni} as d1mes, $P{dtFim} as d2mes
+, p.codigo_barras, p.codigo_adicional1, p.Nome
+
+, isNull (( Select Sum(mpVnd.Quantidade)
+from Movimento_Prod_serv as mpVnd inner join movimento as MV on MV.ordem = mpVnd.Ordem_Movimento
+inner join Movimento_documentos_fiscais as mvFiscais on mpVnd.ordem_movimento = mvFiscais.ordem_movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem  
+inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
+where MV.Tipo_operacao = 'VND' and p.ordem_fabricante = '98' 
+and mpVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
+and F.codigo = '1' and mv.apagado <> '1' 
+and mv.desefetivado_financeiro = '0' and mv.desefetivado_estoque = '0' 
+and mpVnd.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' 
+and mpVnd.Estoque_Desefetivado = '0' 
+and mvFiscais.data_autorizacao between  $P{dtIni} AND $P{dtFim} 
+and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
+group by mpVnd.Ordem_prod_serv ), 0) QtdVend
+
+, isNull (( Select Sum(mpPreVnd.Preco_Final)
+from Movimento_Prod_serv as mpPreVnd inner join movimento as MV on MV.ordem = mpPreVnd.Ordem_Movimento
+inner join Movimento_documentos_fiscais as mvFiscais on mpPreVnd.ordem_movimento = mvFiscais.ordem_movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem  
+inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
+where MV.Tipo_operacao = 'VND' and p.ordem_fabricante = '98' and mpPreVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
+and F.codigo = '1'
+and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mpPreVnd.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' and mpPreVnd.Estoque_Desefetivado = '0' 
+and mvFiscais.data_autorizacao between  $P{dtIni} AND $P{dtFim} 
+and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
+group by mpPreVnd.Ordem_prod_serv ), 0) PreVend 
+ 
+,isnull (( Select Sum(mpDev.Quantidade)
+from Movimento_Prod_serv as mpDev inner join movimento as MV on MV.ordem = mpDev.Ordem_Movimento
+inner join Movimento_documentos_fiscais as mvFiscais on mpDev.ordem_movimento = mvFiscais.ordem_movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem  
+inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
+where MV.Tipo_operacao = 'DEV' and p.ordem_fabricante = '98' and mpDev.Ordem_prod_serv=mp1.Ordem_prod_serv
+and F.codigo = '1'
+and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mpDev.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' and mpDev.Estoque_Desefetivado = '0' 
+and mvFiscais.data_autorizacao between  $P{dtIni} AND $P{dtFim} 
+and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
+group by mpDev.Ordem_prod_serv ), 0) QtdDev
+
+, ( isNull (( Select Sum(mpPreVnd.Preco_Final)
+from Movimento_Prod_serv as mpPreVnd inner join movimento as MV on MV.ordem = mpPreVnd.Ordem_Movimento
+inner join Movimento_documentos_fiscais as mvFiscais on mpPreVnd.ordem_movimento = mvFiscais.ordem_movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem  
+inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
+where MV.Tipo_operacao = 'DEV' and p.ordem_fabricante = '98' and mpPreVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
+and F.codigo = '1'
+and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mpPreVnd.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' and mpPreVnd.Estoque_Desefetivado = '0' 
+and mvFiscais.data_autorizacao between  $P{dtIni} AND $P{dtFim} 
+and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
+group by mpPreVnd.Ordem_prod_serv ), 0)
+ ) PreDev 
+
+, '0,00' as QtdBoni, '0,00' as VlrBoni
+
+,( isNull (( Select Sum(mpVnd.Quantidade)
+from Movimento_Prod_serv as mpVnd inner join movimento as MV on MV.ordem = mpVnd.Ordem_Movimento
+inner join Movimento_documentos_fiscais as mvFiscais on mpVnd.ordem_movimento = mvFiscais.ordem_movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem  
+inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
+where MV.Tipo_operacao = 'VND' and p.ordem_fabricante = '98' and mpVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
+and F.codigo = '1'
+and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mpVnd.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' and mpVnd.Estoque_Desefetivado = '0' 
+and mvFiscais.data_autorizacao between  $P{dtIni} AND $P{dtFim} 
+and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
+group by mpVnd.Ordem_prod_serv ), 0) - 
+isNull(( Select Sum(mpDev.Quantidade)
+from Movimento_Prod_serv as mpDev inner join movimento as MV on MV.ordem = mpDev.Ordem_Movimento
+inner join Movimento_documentos_fiscais as mvFiscais on mpDev.ordem_movimento = mvFiscais.ordem_movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem  
+inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
+where MV.Tipo_operacao = 'DEV' and p.ordem_fabricante = '98' and mpDev.Ordem_prod_serv=mp1.Ordem_prod_serv
+and F.codigo = '1'
+and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mpDev.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' and mpDev.Estoque_Desefetivado = '0' 
+and mvFiscais.data_autorizacao between  $P{dtIni} AND $P{dtFim} 
+and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
+group by mpDev.Ordem_prod_serv ), 0)
+)TotQtd
+
+, ( isNull (( Select Sum(mpPreVnd.Preco_Final)
+from Movimento_Prod_serv as mpPreVnd inner join movimento as MV on MV.ordem = mpPreVnd.Ordem_Movimento
+inner join Movimento_documentos_fiscais as mvFiscais on mpPreVnd.ordem_movimento = mvFiscais.ordem_movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem  
+inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
+where MV.Tipo_operacao = 'VND' and p.ordem_fabricante = '98' and mpPreVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
+and F.codigo = '1'
+and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mpPreVnd.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' and mpPreVnd.Estoque_Desefetivado = '0' 
+and mvFiscais.data_autorizacao between  $P{dtIni} AND $P{dtFim} 
+and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
+group by mpPreVnd.Ordem_prod_serv ), 0) -
+isNull (( Select Sum(mpPreVnd.Preco_Final)
+from Movimento_Prod_serv as mpPreVnd inner join movimento as MV on MV.ordem = mpPreVnd.Ordem_Movimento
+inner join Movimento_documentos_fiscais as mvFiscais on mpPreVnd.ordem_movimento = mvFiscais.ordem_movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem  
+inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
+where MV.Tipo_operacao = 'DEV' and p.ordem_fabricante = '98' and mpPreVnd.Ordem_prod_serv=mp1.Ordem_prod_serv
+and F.codigo = '1'
+and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mpPreVnd.estoque_efetivado = '1' and mv.efetivado_financeiro = '1' and mpPreVnd.Estoque_Desefetivado = '0' 
+and mvFiscais.data_autorizacao between  $P{dtIni} AND $P{dtFim} 
+and p.inativo = '0' and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
+group by mpPreVnd.Ordem_prod_serv ), 0)
+ ) TotPre 
+ 
+FROM Movimento_Prod_serv as MP1 
+inner join movimento as MV on MV.ordem = MP1.Ordem_Movimento 
+inner join Filiais as F on MV.Ordem_Filial = F.Ordem 
+inner join Cli_For as C on MV.[Ordem_Cli_For] = C.Ordem 
+inner join Prod_Serv as p on p.ordem = mp1.ordem_prod_serv 
+inner join Movimento_documentos_fiscais as mvFiscais on mv.ordem = mvFiscais.ordem_movimento
+ 
+where F.codigo = '1' and mv.apagado <> '1' and mv.desefetivado_financeiro = '0' 
+and mv.desefetivado_estoque = '0' and mp1.estoque_efetivado = '1' 
+and mv.efetivado_financeiro = '1' and mp1.Estoque_Desefetivado = '0'
+and mvFiscais.data_autorizacao between  $P{dtIni} AND $P{dtFim} 
+and ( MV.Tipo_operacao = 'VND' or MV.Tipo_operacao = 'DEV' or MV.Tipo_operacao = 'CAN') and p.ordem_fabricante = '98'
+and (p.codigo_adicional1 <> '' or p.codigo_adicional1 <> '0') and (C.CEP <> '' or C.CEP <>'0')
+
+group by mp1.Ordem_prod_serv, p.Nome, p.codigo_barras, p.codigo_adicional1
+order by mp1.Ordem_prod_serv, p.codigo_barras]]>
+	</queryString>
+	<field name="d1mes" class="java.lang.String"/>
+	<field name="d2mes" class="java.lang.String"/>
+	<field name="codigo_barras" class="java.lang.String"/>
+	<field name="codigo_adicional1" class="java.lang.String"/>
+	<field name="Nome" class="java.lang.String"/>
+	<field name="QtdVend" class="java.math.BigDecimal"/>
+	<field name="PreVend" class="java.math.BigDecimal"/>
+	<field name="QtdDev" class="java.math.BigDecimal"/>
+	<field name="PreDev" class="java.math.BigDecimal"/>
+	<field name="QtdBoni" class="java.lang.String"/>
+	<field name="VlrBoni" class="java.lang.String"/>
+	<field name="TotQtd" class="java.math.BigDecimal"/>
+	<field name="TotPre" class="java.math.BigDecimal"/>
+	<variable name="TotalGeral" class="java.lang.Double" resetType="Column" calculation="Sum">
+		<variableExpression><![CDATA[$F{TotPre}]]></variableExpression>
+	</variable>
+	<variable name="GeralTotais" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{TotPre}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="42" splitType="Stretch">
+			<textField>
+				<reportElement x="375" y="0" width="69" height="20" uuid="611d1407-0dad-4f7d-aa93-52d91e72a87c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{d1mes}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="480" y="0" width="75" height="20" uuid="126bec4f-dc0c-4152-8820-4065264d7d45"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{d2mes}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="269" height="42" uuid="3773c9c5-6b65-4d51-aa77-fc0ffad67436"/>
+				<textElement>
+					<font fontName="Arial Black" size="26"/>
+				</textElement>
+				<text><![CDATA[DENTAL KARISMA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="303" y="0" width="72" height="20" uuid="74e406b8-7fda-449b-92dc-f788578f5b1c"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Período: ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="444" y="0" width="36" height="20" uuid="2393e565-bc88-4dc2-a597-5cceb8f728d6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[até]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="42" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="20" uuid="306eee6b-e487-4e90-b85e-8bcbaa89bccb"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Relatório de Faturamento]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="234" y="20" width="87" height="22" uuid="fd96f1a5-7be1-4c99-9e67-b3ed4c82ada3"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Venda]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="321" y="20" width="72" height="22" uuid="24e6b64a-aa73-46f8-abb5-1569812513f4"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Devolu/Canc]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="393" y="20" width="64" height="22" uuid="79348739-1127-4d02-8c23-68747b596753"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Bonificação]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="457" y="20" width="98" height="22" uuid="089427d0-aaf9-4e85-a09f-940596ed7b2c"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="21" splitType="Stretch">
+			<staticText>
+				<reportElement x="93" y="0" width="141" height="21" uuid="ec66c36b-1975-4a6f-9faa-534fecd82b27"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Descrição do Produto Dist]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="234" y="0" width="35" height="21" uuid="f87b9424-2b25-459a-9956-28060183c781"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[QtdVen]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="43" y="0" width="50" height="21" uuid="3a7d05c4-3327-4cac-8fe8-5636bb4dac36"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top"/>
+				<text><![CDATA[Código]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="269" y="0" width="52" height="21" uuid="ffe71641-7df6-4d28-8ada-ac4d6e6786ab"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[VlrVend]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="490" y="0" width="65" height="21" uuid="a1ec68c1-1851-4733-8f6e-b8a678ea3b58"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[TotPre]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="457" y="0" width="33" height="21" uuid="65f1c26b-a617-47dc-9c78-4b916f12a806"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[TotQtd]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="422" y="0" width="35" height="21" uuid="218f9794-0be9-4e79-bb1c-f5b054fd6c7a"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[VlrBoni]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="393" y="0" width="29" height="21" uuid="b483f6c8-0d00-4ca3-b8d0-ed2205863191"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[QtdBoni]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="348" y="0" width="45" height="21" uuid="44feaa0f-e777-4bcb-b8da-66d96b9cd422"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[PreDev]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="321" y="0" width="27" height="21" uuid="206d3f24-f9c7-4b1d-aefa-4636ff63eb5a"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[QtdDev]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="43" height="21" backcolor="#FFFFFF" uuid="ce9f6aaf-0c38-46f3-9e76-a632906a9525"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top"/>
+				<text><![CDATA[SKU]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="13" splitType="Stretch">
+			<textField>
+				<reportElement mode="Transparent" x="93" y="0" width="141" height="13" uuid="1fa8c9ac-b04b-4c1c-8dfd-e74242388e7b"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Nome}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="234" y="0" width="35" height="13" uuid="067b36f7-36e4-49f3-a791-416c7d6457de"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QtdVend}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="269" y="0" width="52" height="13" uuid="bbb4e939-be3a-43e7-b7a0-9cf91426a0bc"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PreVend}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="321" y="0" width="27" height="13" uuid="d827f532-cdc4-47bf-b3e4-94432a7c1324"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QtdDev}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="348" y="0" width="45" height="13" uuid="2d3eb809-755d-4697-9011-bafe4d2cf994"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PreDev}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="393" y="0" width="29" height="13" uuid="41b42cc1-8710-4136-95c9-1a462f2049fc"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QtdBoni}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="422" y="0" width="35" height="13" uuid="98995e20-c6f1-45ea-bdde-72e5fa85297e"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VlrBoni}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;-#,##0.00">
+				<reportElement x="457" y="0" width="33" height="13" uuid="b55da9e2-2685-4fa1-886f-039ac32e9720"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TotQtd}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="490" y="0" width="65" height="13" uuid="49dbf172-d856-4214-9dfd-fa26b88281bd"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TotPre}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="43" y="0" width="50" height="13" uuid="f86bf1b6-335b-4742-8a11-e77630655930"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codigo_barras}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="43" height="13" uuid="57879050-37a8-45f3-984b-87c1904f903f"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codigo_adicional1}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="2" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="18" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="80" height="18" uuid="4bd92917-8419-4a58-aa27-2d7737b24ee7"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page   "  +   $V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="80" y="0" width="40" height="18" uuid="41f3c8ae-6bf5-4901-b224-65e6ff54e65b"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="375" y="0" width="80" height="18" uuid="4ee97555-2f4d-44b9-86a0-0b225af08bce"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Página:]]></text>
+			</staticText>
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="455" y="0" width="100" height="18" uuid="d172ce64-09a5-44a5-9e43-ced848c88c0e"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TotalGeral}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="21" splitType="Stretch">
+			<textField pattern="¤ #,##0.00">
+				<reportElement x="455" y="0" width="100" height="20" uuid="0a3813ce-3983-4205-9a0c-d1d0bc045c17"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{GeralTotais}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="375" y="1" width="80" height="20" uuid="ce680c3a-5860-4688-be98-fd67a44342cc"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Geral:]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>
