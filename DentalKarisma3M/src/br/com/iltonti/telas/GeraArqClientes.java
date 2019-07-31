@@ -57,7 +57,7 @@ public class GeraArqClientes {
                 + " inner join prod_serv as p on mp.Ordem_Prod_Serv = p.ordem"
                 + " inner join Filiais as F on MV.Ordem_Filial = F.Ordem "
                 + " where p.ordem_fabricante = '98' and F.codigo = '1' and c.cep <> '' and c.cep <> '0'"
-                + " and mp.data_efetivacao_estoque between DATEADD(DAY, -"+ dataHora.diasGera + " , GETDATE()) AND getdate() "
+                + " and mp.data_efetivacao_estoque between DATEADD(DAY, -"+ dataHora.diasGera + " , GETDATE()) and GETDATE() "
                 + " and c.codigo > 0 and  (c.cnpj_sem_literais <> '' or c.cpf_sem_literais <> '') and (c.cnpj_sem_literais <> '0' or c.cpf_sem_literais <> '0')"
                 + "and cpf_sem_literais not in ('0') order by 7";
         

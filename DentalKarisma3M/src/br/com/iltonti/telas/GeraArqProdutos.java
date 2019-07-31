@@ -52,7 +52,7 @@ public class GeraArqProdutos {
 "  inner join Filiais as F on e.Ordem_Filial = F.Ordem  " +
 "  where pc.Ordem_Tabela_Preco = '2' and p.inativo = '0'  " +
 "  and p.ordem_fabricante = '98' and F.codigo = '1' " +
-"  and mp.data_efetivacao_estoque between DATEADD(DAY, -"+ dataHora.diasGera + " , GETDATE()) AND getdate() " +
+"  and mp.data_efetivacao_estoque between DATEADD(DAY, -"+ dataHora.diasGera + " , GETDATE()) and GETDATE() " +
 "  and p.codigo_adicional1 <> '' and p.codigo_adicional1 <> '0'" +
 "  order by p.codigo";
         try {

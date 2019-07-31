@@ -7,7 +7,6 @@
             <source-roots>
                 <root id="src.relatorios.dir" name="Relatorios"/>
                 <root id="src.dir"/>
-                <root id="src.Arq3m.dir"/>
             </source-roots>
             <test-roots>
                 <root id="test.src.dir"/>
